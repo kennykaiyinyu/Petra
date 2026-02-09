@@ -1,0 +1,5 @@
+add_executable(BasicUsage basic_usage.cpp)
+add_executable(MonteCarloConvergence MonteCarloConvergence.cpp)
+
+target_link_libraries(BasicUsage PRIVATE GreekCore)
+target_link_libraries(MonteCarloConvergence PRIVATE GreekCore)

@@ -1,0 +1,85 @@
+
+package yc.core;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.TreeMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.SortedMap;
+import java.util.Collections;
+import java.util.Set;
+import java.util.ArrayList;
+import java.io.PrintStream;
+import java.util.GregorianCalendar;
+
+import progression.Interpolator;
+import progression.Point;
+/**
+ * The yeild curve is a collection of points which 
+ * @author kykyu 
+ * 
+ */
+public class YieldCurve-to-erase implements SortedMap<Calendar, Double> {
+
+	
+	private SortedMap<Calendar, Double> thePointSet = new TreeMap< Calendar, Double>();
+	private Calendar startDay;
+	// added on Apr 6
+	
+	private Interpolator interpolator;
+	
+	public YieldCurve(Calendar startDay, Interpolator interpolator) {
+		fix(startDay);
+		this.startDay = startDay;
+		thePointSet.put(startDay, new Double(0.0)); // initialization
+		this.interpolator = interpolator;
+	}
+	
+	public Calendar getCloneOfStartDay() {
+		return (Calendar) this.startDay;
+	}
+	private Calendar fix(Calendar c) {
+		c.clear(Calendar.MILLISECOND);
+		c.clear(Calendar.SECOND);
+		c.clear(Calendar.MINUTE);
+		c.clear(Calendar.HOUR);
+		return c;
+	}
+	
+	
+	
+	public void addPoint(Calendar someDay, double rateOfReturn ) {
+		thePointSet.put(fix(someDay), new Double(rateOfReturn));
+	
+	}
+	
+	public double getZeroRateOnDay(Calendar day) throws NoRateInTheFutureException, NoRateAtTimeBeforeTodayException{
+		return this.getRateOfReturnOnDate(fix(day));
+	}
+	
+
+	
+	public void setZeroRateOnDay(Calendar day, double rate) {
+		addPoint(day, rate);
+	}
+	
+	public double getRateOfReturnOnDate(Calendar someDay) throws NoRateInTheFutureException, NoRateAtTimeBeforeTodayException{
+		fix(someDay);
+		return interpolator.getValueOn(someDay, thePointSet);
+	}
+	
+	public SortedMap<Calendar, Double> getAllRates() {
+		return this.thePointSet;
+	}
+}
+	
+	
+	
+	
+class UndefinedRateOnYieldCurveException extends Exception {
+	UndefinedRateOnYieldCurveException() {}
+	UndefinedRateOnYieldCurveException(String message) { super(message);}
+}
+
