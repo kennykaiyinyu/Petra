@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <cmath>
+#include <mutex>
 
 namespace GreekCore {
 
@@ -67,6 +68,40 @@ namespace GreekCore {
         void dumpOneResult(double result) override;
         std::vector<std::vector<double>> getResultsSoFar() const override;
         std::unique_ptr<StatisticsMC> clone() const override;
+    };
+
+    /**
+     * @brief Thread-Safe Decorator for Statistics Gatherer
+     * 
+     * Adds mutex protection to any StatisticsMC implementation.
+     * Useful when the gatherer is shared between an async worker and a monitoring thread.
+     */
+    class StatisticsThreadSafe : public StatisticsMC {
+    private:
+        std::unique_ptr<StatisticsMC> m_inner; // Exclusive ownership
+        mutable std::mutex m_mutex;
+
+    public:
+        explicit StatisticsThreadSafe(std::unique_ptr<StatisticsMC> inner) 
+            : m_inner(std::move(inner)) {}
+
+        // Copy mechanism
+        StatisticsThreadSafe(const StatisticsThreadSafe& other) 
+            : m_inner(other.m_inner->clone()) {}
+
+        void dumpOneResult(double result) override {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            m_inner->dumpOneResult(result);
+        }
+
+        std::vector<std::vector<double>> getResultsSoFar() const override {
+            std::lock_guard<std::mutex> lock(m_mutex);
+            return m_inner->getResultsSoFar();
+        }
+
+        std::unique_ptr<StatisticsMC> clone() const override {
+            return std::make_unique<StatisticsThreadSafe>(*this);
+        }
     };
 
 }

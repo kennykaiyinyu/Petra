@@ -8,6 +8,7 @@
 #include <numeric>
 #include <functional>
 #include <numbers>
+#include <future>
 #include "GreekCore/Numerics/RNG.h"
 #include "GreekCore/Pricing/Parameters.h"
 #include "GreekCore/Numerics/Statistics.h"
@@ -115,6 +116,21 @@ namespace GreekCore {
         static void priceEuropean(double S0, const Parameters& r, const Parameters& sigma, double T, 
                                   size_t paths, const PayoffType& payoff, StatisticsMC& gatherer) {
             runSimulation(S0, r, sigma, T, paths, payoff, gatherer);
+        }
+
+        // Templated European Pricer (Async) - References the gatherer
+        // User (Caller) is responsible for ensuring 'gatherer' exists for the duration of the future.
+        template<typename PayoffType>
+        static std::future<void> priceEuropeanAsync(
+            double S0, const Parameters& r, const Parameters& sigma, double T, 
+            size_t paths, const PayoffType& payoff, StatisticsMC& gatherer) 
+        {
+            // Capture gatherer by reference. 
+            // Note: We capture S0, r, sigma... by value to ensure they exist.
+            // But gatherer is passed by reference to let the caller own it.
+            return std::async(std::launch::async, [S0, r, sigma, T, paths, payoff, &gatherer]() {
+                runSimulation(S0, r, sigma, T, paths, payoff, gatherer);
+            });
         }
 
         // Templated European Pricer (Convenience with Greeks)

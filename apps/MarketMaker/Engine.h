@@ -57,16 +57,14 @@ namespace Petra::MarketMaker {
             }
         }
 
-        [[nodiscard]]
-        const PortfolioState& get_state() const { return state_; }
+        [[nodiscard]] const PortfolioState& get_state() const { return state_; }
 
     private:
         StrategyType strategy_;
         QuoteCallback on_new_quote_;
         PortfolioState state_;
-        Petra::MarketMaker::Risk::VpinEstimator toxicity_monitor_;
+        Risk::VpinEstimator toxicity_monitor_;
     };
+
 }
-
-
 #endif // PETRA_MM_ENGINE_H

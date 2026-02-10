@@ -3,3 +3,6 @@ add_executable(MonteCarloConvergence MonteCarloConvergence.cpp)
 
 target_link_libraries(BasicUsage PRIVATE GreekCore)
 target_link_libraries(MonteCarloConvergence PRIVATE GreekCore)
+
+add_executable(AsyncMonteCarlo AsyncMonteCarlo.cpp)
+target_link_libraries(AsyncMonteCarlo PRIVATE GreekCore)
