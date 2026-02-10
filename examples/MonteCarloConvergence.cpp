@@ -18,13 +18,15 @@ double black_scholes_call(double S, double K, double r, double sigma, double T) 
 int main() {
     double S = 100.0;
     double K = 100.0;
-    double r = 0.05;
-    double sigma = 0.2;
+    // Using Parameters class (Bridge Pattern)
+    Parameters r(0.05);
+    Parameters sigma(0.2);
     double T = 1.0;
 
-    std::cout << "--- 1. Vanilla Call Convergence ---\n";
+    std::cout << "--- 1. Vanilla Call Convergence (using Parameters) ---\n";
     PayOffVanilla payoff(OptionType::Call, K);
-    double exact = black_scholes_call(S, K, r, sigma, T);
+    // Note: black_scholes_call still takes raw doubles, so we use the .mean() or just hardcode for validatio
+    double exact = black_scholes_call(S, K, 0.05, 0.2, T);
 
     std::cout << "Exact Black-Scholes Price: " << std::fixed << std::setprecision(6) << exact << "\n\n";
     std::cout << std::setw(12) << "Paths" 
@@ -51,9 +53,15 @@ int main() {
     PayOffDigital digitalPayoff(OptionType::Call, K);
     // Digital Call BS: exp(-rT) * N(d2)
     auto N = [](double x) { return 0.5 * std::erfc(-x / std::numbers::sqrt2); };
-    double d1 = (std::log(S / K) + (r + 0.5 * sigma * sigma) * T) / (sigma * std::sqrt(T));
-    double d2 = d1 - sigma * std::sqrt(T);
-    double exact_dig = std::exp(-r * T) * N(d2);
+    
+    // Calculate integrals for BS formula (works for time-dependent params too)
+    double r_int = r.integral(0, T);           // integral(r) dt
+    double vol_sq_int = sigma.integralSquare(0, T); // integral(sigma^2) dt
+    double vol_total = std::sqrt(vol_sq_int);  // sqrt(integral(sigma^2) dt)
+
+    double d1 = (std::log(S / K) + r_int + 0.5 * vol_sq_int) / vol_total;
+    double d2 = d1 - vol_total;
+    double exact_dig = std::exp(-r_int) * N(d2);
     
     std::cout << "Exact Digital Price: " << exact_dig << "\n";
     auto res_dig = MonteCarloPricer::priceEuropean(S, r, sigma, T, 100000, digitalPayoff);

@@ -16,6 +16,7 @@ set(SOURCES
     src/GreekCore/Numerics/RNG.cpp
     src/GreekCore/Pricing/PayOff.cpp
     src/GreekCore/Pricing/MonteCarlo.cpp
+    src/GreekCore/Pricing/Parameters.cpp
     src/GreekCore/Rates/YieldCurve.cpp
     src/GreekCore/Time/Date.cpp
     src/GreekCore/Time/Calendar.cpp
@@ -69,3 +70,6 @@ if(BUILD_BENCHMARKS)
 # Applications
 add_subdirectory(apps/MarketMaker)
 endif()
+# Example showing the Bridge logic from screenshots
+add_executable(BridgeUsage examples/BridgeUsage.cpp)
+target_link_libraries(BridgeUsage PRIVATE GreekCore)

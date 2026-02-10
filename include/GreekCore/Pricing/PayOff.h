@@ -13,11 +13,11 @@ namespace GreekCore {
     // CRTP Base Class - Enforces interface at compile time without vtables
     // Contract: The specific option logic and parameters (Strike, Barrier, etc.)
     // MarketParameters: The market data required to evaluate the payoff (Spot, Path, etc.)
-    template<typename Contract, typename MarketParameters>
+    template<typename Derived, typename MarketParameters>
     class PayOff {
     public:
         [[nodiscard]] double operator()(const MarketParameters& market_data) const {
-            return static_cast<const Contract*>(this)->implementation(market_data);
+            return static_cast<const Derived*>(this)->implementation(market_data);
         }
         PayOff() = default;
     };
