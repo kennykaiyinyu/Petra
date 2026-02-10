@@ -17,6 +17,7 @@ set(SOURCES
     src/GreekCore/Pricing/PayOff.cpp
     src/GreekCore/Pricing/MonteCarlo.cpp
     src/GreekCore/Pricing/Parameters.cpp
+    src/GreekCore/Numerics/Statistics.cpp
     src/GreekCore/Rates/YieldCurve.cpp
     src/GreekCore/Time/Date.cpp
     src/GreekCore/Time/Calendar.cpp

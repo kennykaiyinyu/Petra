@@ -10,6 +10,7 @@
 #include <numbers>
 #include "GreekCore/Numerics/RNG.h"
 #include "GreekCore/Pricing/Parameters.h"
+#include "GreekCore/Numerics/Statistics.h"
 
 namespace GreekCore {
 
@@ -33,6 +34,38 @@ namespace GreekCore {
             double price;
             double std_err;
         };
+
+        // Core engine that pushes results to a Gatherer
+        template<typename PayoffType>
+        static void runSimulation(double S0, const Parameters& r, const Parameters& sigma, double T, 
+                                  size_t paths, const PayoffType& payoff, StatisticsMC& gatherer) {
+            
+            double r_integral = r.integral(0.0, T);
+            double vol_sq_integral = sigma.integralSquare(0.0, T);
+            // double rm_vol = std::sqrt(vol_sq_integral / T); // Unused for now
+
+            double drift = r_integral - 0.5 * vol_sq_integral;
+            double diff = std::sqrt(vol_sq_integral);
+            double df = std::exp(-r_integral);
+            
+            Xoshiro256 local_rng(42); 
+
+            // Using Box-Muller for consistency with previous implementation
+            for (size_t i = 0; i < paths; ++i) {
+                double u1 = Xoshiro256::to_double(local_rng());
+                if (u1 < 1e-9) u1 = 1e-9;
+                double u2 = Xoshiro256::to_double(local_rng());
+                
+                double R = std::sqrt(-2.0 * std::log(u1));
+                double theta_bm = 2.0 * std::numbers::pi * u2;
+                double z = R * std::cos(theta_bm);
+                
+                double ST = S0 * std::exp(drift + diff * z);
+                double val = payoff(ST);
+
+                gatherer.dumpOneResult(val * df);
+            }
+        }
 
         template<typename Func>
         static MonteCarloResult calculateWithGreeks(double S0, const Parameters& r, const Parameters& sigma, double T, Func pricer_func) {
@@ -77,55 +110,24 @@ namespace GreekCore {
         }
 
     public:
-        // Templated European Pricer
+        // Templated European Pricer (With Gatherer) - Chapter 5 Style
+        template<typename PayoffType>
+        static void priceEuropean(double S0, const Parameters& r, const Parameters& sigma, double T, 
+                                  size_t paths, const PayoffType& payoff, StatisticsMC& gatherer) {
+            runSimulation(S0, r, sigma, T, paths, payoff, gatherer);
+        }
+
+        // Templated European Pricer (Convenience with Greeks)
         template<typename PayoffType>
         static MonteCarloResult priceEuropean(double S0, const Parameters& r, const Parameters& sigma, double T, 
                                             size_t paths, const PayoffType& payoff) {
             
             auto engine_logic = [&](double S_loc, const Parameters& r_loc, const Parameters& sigma_loc, double T_loc) -> SimResult {
-                // Use integral of rates and vol for the full period
-                double r_integral = r_loc.integral(0.0, T_loc);
-                double vol_sq_integral = sigma_loc.integralSquare(0.0, T_loc);
-                double rm_vol = std::sqrt(vol_sq_integral / T_loc);
-
-                double drift = r_integral - 0.5 * vol_sq_integral;
-                double diff = std::sqrt(vol_sq_integral);
-                double df = std::exp(-r_integral);
+                StatisticsMean localGatherer;
+                runSimulation(S_loc, r_loc, sigma_loc, T_loc, paths, payoff, localGatherer);
                 
-                Xoshiro256 local_rng(42); 
-
-                double sum = 0.0;
-                double sum_sq = 0.0;
-                size_t n_pairs = 0;
-
-                for (size_t i = 0; i < paths; i += 2) {
-                    double u1 = Xoshiro256::to_double(local_rng());
-                    if (u1 < 1e-9) u1 = 1e-9;
-                    double u2 = Xoshiro256::to_double(local_rng());
-                    
-                    double R = std::sqrt(-2.0 * std::log(u1));
-                    double theta_bm = 2.0 * std::numbers::pi * u2;
-                    double z1 = R * std::cos(theta_bm);
-                    
-                    // Antithetic
-                    double ST_1 = S_loc * std::exp(drift + diff * z1);
-                    double ST_2 = S_loc * std::exp(drift + diff * (-z1));
-                    
-                    double val1 = payoff(ST_1);
-                    double val2 = payoff(ST_2);
-                    double pair_avg = 0.5 * (val1 + val2);
-
-                    sum += pair_avg;
-                    sum_sq += pair_avg * pair_avg;
-                    n_pairs++;
-                }
-                
-                double mean = (n_pairs > 0) ? (sum / n_pairs) : 0.0;
-                double variance = (n_pairs > 1) ? ((sum_sq - n_pairs * mean * mean) / (n_pairs - 1)) : 0.0;
-                if (variance < 0) variance = 0.0;
-                double std_err = std::sqrt(variance) / std::sqrt(n_pairs);
-
-                return {mean * df, std_err * df};
+                auto results = localGatherer.getResultsSoFar();
+                return {results[0][0], results[0][1]};
             };
 
             return calculateWithGreeks(S0, r, sigma, T, engine_logic);
