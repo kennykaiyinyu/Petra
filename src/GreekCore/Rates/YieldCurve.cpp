@@ -17,6 +17,7 @@ namespace GreekCore {
     }
 
     YieldCurve::YieldCurve(Date reference_date,
+                           std::span<const CurveInput> instruments,
                            DayCounterFn dc,
                            InterpolatorFn interp)
         : ref_date_(reference_date), 
@@ -24,10 +25,21 @@ namespace GreekCore {
           interp_(interp ? std::move(interp) : defaultInterpolator)
     {
         // Initialize with today: t=0, DF=1.0 => log_df=0.0
-        times_.reserve(20);
-        log_dfs_.reserve(20);
+        times_.reserve(instruments.size() + 1);
+        log_dfs_.reserve(instruments.size() + 1);
         times_.push_back(0.0);
         log_dfs_.push_back(0.0);
+
+        // Run Bootstrap immediately
+        for (const auto& instr : instruments) {
+            double T = dc_(ref_date_, instr.maturity_date);
+
+            if (T <= times_.back()) {
+                throw std::invalid_argument("Instruments must be sorted by maturity");
+            }
+
+            bootstrapPoint(instr, T);
+        }
     }
 
     double YieldCurve::getDiscountFactor(Date d) const {
@@ -51,18 +63,6 @@ namespace GreekCore {
         if (t < 1e-8) return -log_dfs_[0];
         double df = getDiscountFactor(t);
         return -std::log(df) / t;
-    }
-
-    void YieldCurve::build(std::span<const CurveInput> instruments) {
-        for (const auto& instr : instruments) {
-            double T = dc_(ref_date_, instr.maturity_date);
-
-            if (T <= times_.back()) {
-                throw std::invalid_argument("Instruments must be sorted by maturity");
-            }
-
-            bootstrapPoint(instr, T);
-        }
     }
 
     void YieldCurve::bootstrapPoint(const CurveInput& instr, double T) {

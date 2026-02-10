@@ -41,8 +41,7 @@ protected:
 
 TEST_F(YieldCurveTest, BootstrapsCorrectly) {
     // Default Act/365
-    YieldCurve curve(today);
-    curve.build(inputs);
+    YieldCurve curve(today, inputs);
 
     // 1. Check 6M Point
     // T = 182/365 approx 0.4986
@@ -65,13 +64,11 @@ TEST_F(YieldCurveTest, ThrowsOnUnsortedInput) {
         {make_date(2024, 1, 1), 0.025, 1},
         {make_date(2023, 6, 1), 0.02, 0}
     };
-    YieldCurve curve(today);
-    EXPECT_THROW(curve.build(bad_inputs), std::invalid_argument);
+    EXPECT_THROW(YieldCurve(today, bad_inputs), std::invalid_argument);
 }
 
 TEST_F(YieldCurveTest, ZeroRateCalculation) {
-    YieldCurve curve(today);
-    curve.build(inputs);
+    YieldCurve curve(today, inputs);
     
     // Check Zero Rate at 1Y
     // r = -ln(DF) / t

@@ -31,15 +31,18 @@ namespace GreekCore {
         using InterpolatorFn = std::function<double(double, std::span<const double>, std::span<const double>)>;
 
         /**
-         * @brief Construct a new Yield Curve object
+         * @brief Construct a new Yield Curve object (RAII).
          * 
          * @param reference_date The anchor date (t=0)
+         * @param instruments Sorted list of market instruments to bootstrap from.
          * @param dc Day counting strategy function (defaults to Act/365)
          * @param interp Interpolation strategy function (defaults to Linear)
+         * @throws std::invalid_argument if instruments are not sorted or invalid.
          */
-        explicit YieldCurve(Date reference_date, 
-                            DayCounterFn dc = nullptr, 
-                            InterpolatorFn interp = nullptr);
+        YieldCurve(Date reference_date, 
+                   std::span<const CurveInput> instruments,
+                   DayCounterFn dc = nullptr, 
+                   InterpolatorFn interp = nullptr);
 
         /**
          * @brief Calculates discount factor for a specific date.
@@ -52,11 +55,6 @@ namespace GreekCore {
          */
         [[nodiscard]] double getZeroRate(Date d) const;
         [[nodiscard]] double getZeroRate(double t) const;
-
-        /**
-         * @brief Bootstraps the curve from a sorted list of par instruments.
-         */
-        void build(std::span<const CurveInput> instruments);
 
     private:
         Date ref_date_;
