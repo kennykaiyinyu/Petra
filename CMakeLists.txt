@@ -12,7 +12,6 @@ set(SOURCES
     src/GreekCore/Pricing/BinomialTree.cpp
     src/GreekCore/Rates/Tenor.cpp
     src/GreekCore/Numerics/BrentSolver.cpp
-    src/GreekCore/Rates/Interpolator.cpp
     src/GreekCore/Numerics/RNG.cpp
     src/GreekCore/Pricing/PayOff.cpp
     src/GreekCore/Pricing/MonteCarlo.cpp

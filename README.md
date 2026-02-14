@@ -1,40 +1,44 @@
-# GreekCore
+# Petra
 
-High-Performance C++20 Option Pricing & Yield Curve Library.
+Petra is a high-performance quantitative finance library implemented in C++20. It provides core pricing engines and rate modelling tools designed for efficiency and modern C++ practices.
 
-## Structure
+## Features
 
-- **include/GreekCore/**: Public header-only library (Calculation Engine).
-  - **Pricing/**: Option pricing engines and payoffs.
-  - **Rates/**: Yield curve construction and interpolation.
-  - **Time/**: Date handling, Calendars, and Day Count Conventions.
-- **apps/**: Applications built on GreekCore.
-  - **MarketMaker/**: Low-latency trading engine.
-- **tests/**: Unit and integration tests (GoogleTest).
-- **examples/**: Usage examples.
-- **benchmarks/**: Performance benchmarks.
+*   **Yield Curve Bootstrapping**: Supports Deposits, FRAs, and Swaps with configurable interpolation and day count strategies.
+*   **Monte Carlo Engine**: High-performance pricing for European and Path-Dependent options, including Greek calculation and async execution.
+*   **Binomial Tree**: Pricing for American and European options.
+*   **Modern C++**: Utilizes C++20 Concepts, `std::span`, and template strategies for zero-overhead abstraction.
+*   **Utilities**: Date arithmetic, Tenor parsing (e.g., "T/N", "3M"), and Brent's solver.
 
-## Build
+## Build Instructions
+
+### Prerequisites
+
+*   CMake 3.20+
+*   C++20 compliant compiler (GCC, Clang, MSVC)
+
+### Building
 
 ```bash
-mkdir build && cd build
-cmake ..
-cmake --build .
-ctest
+mkdir build
+cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+cmake --build . -- -j$(nproc)
 ```
 
-## Requirements
+## Running Tests
 
-- C++20 Compiler (GCC 10+, Clang 10+, MSVC 19.29+)
-- CMake 3.20+
+Unit tests are built using GoogleTest.
 
-## Key Features
+```bash
+cd build
+ctest --output-on-failure
+```
 
-### Asynchronous Monte Carlo Engine
-GreekCore now supports asynchronous pricing for long-running simulations, allowing the main application thread to remain responsive.
+## Benchmarks
 
-- **Non-Blocking Execution**: Use `MonteCarloPricer::priceEuropeanAsync` to return a `std::future`.
-- **Thread-Safe Monitoring**: Use `StatisticsThreadSafe` (Decorator Pattern) to query simulation progress in real-time from the main thread while the worker thread computes results.
-- **Zero-Overhead Pattern**: Supports `std::unique_ptr` and pass-by-reference to avoid shared pointer locking overhead if desired.
+Performance benchmarks are built using Google Benchmark.
 
-See `examples/AsyncMonteCarlo.cpp` for a complete demonstration.
+```bash
+./build/benchmarks/GreekCoreBenchmarks
+```

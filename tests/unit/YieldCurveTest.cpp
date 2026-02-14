@@ -21,12 +21,6 @@ protected:
         // 2. 1Y Swap (approx 1.0y)
         // 3. 2Y Swap
         
-        // Exact 0.5, 1.0, 2.0 years under Act/365
-        Date d_6m = today + std::chrono::days(182); // ~0.498, rounding for logic checks
-        // For testing "Exact" numbers, let's just assume we want roughly the right horizons.
-        // A better approach for this Unit Test is to use the dates that correspond to exactly 0.5, 1.0 using the DayCounter logic
-        // But simply providing arbitrary dates works if we check result consistency.
-        
         Date d_1y = today + std::chrono::days(365);
         Date d_2y = today + std::chrono::days(730);
         Date d_6m_exact = today + std::chrono::days(static_cast<int>(365 * 0.5)); // 182 days
