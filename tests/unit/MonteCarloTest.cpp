@@ -24,7 +24,6 @@ TEST(MonteCarloTest, ConvergenceToBlackScholes) {
 
     PayOffVanilla payoff(OptionType::Call, K);
     
-    // Updated syntax: No template parameter //
     auto result = MonteCarloPricer::priceEuropean(S, r, sigma, T, paths, payoff);
     double exact = black_scholes_call(S, K, r, sigma, T);
 
@@ -39,8 +38,6 @@ TEST(MonteCarloTest, ConvergenceToBlackScholes) {
 }
 
 TEST(MonteCarloTest, AntitheticVarianceReduction) {
-    // Hard to test randomness deterministically without seed control,
-    // but we can ensure it runs and produces logical values.
     double S = 100.0;
     PayOffVanilla payoff(OptionType::Call, 110.0); // OTM Call
     auto result = MonteCarloPricer::priceEuropean(S, 0.05, 0.2, 1.0, 1000, payoff);
@@ -120,4 +117,3 @@ TEST(MonteCarloTest, GreeksAccuracy) {
     EXPECT_NEAR(result.rho, expected.rho, 2.0);
     EXPECT_NEAR(result.theta, expected.theta, 1.0);
 }
-

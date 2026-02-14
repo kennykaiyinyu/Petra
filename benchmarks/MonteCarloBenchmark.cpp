@@ -1,8 +1,9 @@
 #include <benchmark/benchmark.h>
 #include "GreekCore/Pricing/MonteCarlo.h"
 #include "GreekCore/Pricing/PayOff.h"
-#include "GreekCore/Rates/Interpolator.h"
+#include "GreekCore/Rates/InterpolatorStrategy.h"
 #include <vector>
+#include <span>
 
 using namespace GreekCore;
 
@@ -49,8 +50,7 @@ static void BM_Interpolation(benchmark::State& state) {
     for (auto _ : state) {
         double val = LinearInterpolator::interpolate(x, t_span, r_span);
         benchmark::DoNotOptimize(val);
-        x += 0.0001; // Slightly shift to prevent total caching of result? 
-                     // Actually, keeping calculation hot is fine for measuring logic cost.
+        x += 0.0001;
         if(x > 49.0) x = 0.0;
     }
 }

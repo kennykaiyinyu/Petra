@@ -25,7 +25,6 @@ int main() {
 
     std::cout << "--- 1. Vanilla Call Convergence (using Parameters) ---\n";
     PayOffVanilla payoff(OptionType::Call, K);
-    // Note: black_scholes_call still takes raw doubles, so we use the .mean() or just hardcode for validatio
     double exact = black_scholes_call(S, K, 0.05, 0.2, T);
 
     std::cout << "Exact Black-Scholes Price: " << std::fixed << std::setprecision(6) << exact << "\n\n";

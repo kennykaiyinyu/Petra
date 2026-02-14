@@ -32,9 +32,9 @@ protected:
         Date d_6m_exact = today + std::chrono::days(static_cast<int>(365 * 0.5)); // 182 days
 
         inputs = {
-            {d_6m_exact, 0.02, 0}, 
-            {d_1y, 0.025, 1}, 
-            {d_2y, 0.030, 1} 
+            {InstrumentType::Deposit, 0.02, d_6m_exact, today, 0}, 
+            {InstrumentType::Swap, 0.025, d_1y, today, 1}, 
+            {InstrumentType::Swap, 0.030, d_2y, today, 1} 
         };
     }
 };
@@ -61,8 +61,8 @@ TEST_F(YieldCurveTest, BootstrapsCorrectly) {
 
 TEST_F(YieldCurveTest, ThrowsOnUnsortedInput) {
     std::vector<CurveInput> bad_inputs = {
-        {make_date(2024, 1, 1), 0.025, 1},
-        {make_date(2023, 6, 1), 0.02, 0}
+        {InstrumentType::Swap, 0.025, make_date(2024, 1, 1), today, 1},
+        {InstrumentType::Deposit, 0.02, make_date(2023, 6, 1), today, 0}
     };
     EXPECT_THROW(YieldCurve(today, bad_inputs), std::invalid_argument);
 }
@@ -77,4 +77,21 @@ TEST_F(YieldCurveTest, ZeroRateCalculation) {
 
     double zero_1y = curve.getZeroRate(inputs[1].maturity_date);
     EXPECT_NEAR(zero_1y, expected_zero, 1e-7);
+}
+
+TEST_F(YieldCurveTest, HandlesFRA) {
+    // Add an FRA from 6M to 9M
+    // 6M DF is known from first input (~0.990099)
+    // FRA Rate 3%
+    Date d_6m = inputs[0].maturity_date;
+    Date d_9m = today + std::chrono::days(273); // ~0.75y
+    
+    std::vector<CurveInput> fra_inputs = inputs;
+    // Insert FRA after 6M deposit
+    fra_inputs.insert(fra_inputs.begin() + 1, {InstrumentType::FRA, 0.03, d_9m, d_6m, 0});
+    
+    YieldCurve curve(today, fra_inputs);
+    
+    // Check that the curve bootstrapped successfully
+    EXPECT_NO_THROW(auto x = curve.getDiscountFactor(d_9m));
 }

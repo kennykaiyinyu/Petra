@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 
-// Updated include path based on the 'include/GreekCore' structure
 #include <GreekCore/Pricing/PayOff.h>
 
 int main() {

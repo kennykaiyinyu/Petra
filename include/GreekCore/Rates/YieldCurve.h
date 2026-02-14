@@ -2,44 +2,48 @@
 #define GREEKCORE_YIELDCURVE_H
 
 #include <vector>
-#include <functional>
 #include <span>
+#include <cmath>
+#include <concepts>
 #include "GreekCore/Time/Date.h"
+#include "GreekCore/Rates/InterpolatorStrategy.h"
+#include "GreekCore/Time/DayCountStrategy.h"
+#include "GreekCore/Numerics/BrentSolver.h"
 
 namespace GreekCore {
 
     using Time::Date;
+
+    enum class InstrumentType {
+        Deposit,
+        FRA,
+        Swap
+    };
 
     /**
      * @brief Curve Input Definition.
      * Defined by a concrete date, rate, and frequency.
      */
     struct CurveInput {
-        Date maturity_date; 
+        InstrumentType type;
         double rate;          // Annualized Par Rate (e.g., 0.05)
+        Date maturity_date; 
+        Date start_date;      // Required. For Spot instruments, set to reference date.
         int frequency;        // 0 = Simple/Zero, 1,2,4 = Swap payments per year
     };
 
     /**
      * @brief High-Performance Yield Curve using SoA layout.
-     * Implementation details hidden in source file.
+     * Templated on strategies for maximum compiler optimization (inlining).
      */
+    template<DayCountStrategy DC = DefaultDayCounter, InterpolatorStrategy Interp = LinearInterpolator>
     class YieldCurve {
     public:
-        // Function types for strategies
-        using DayCounterFn = std::function<double(Date, Date)>;
-        using InterpolatorFn = std::function<double(double, std::span<const double>, std::span<const double>)>;
-
         /**
          * @brief Construct a new Yield Curve object (RAII).
-         * 
-         * @param reference_date The anchor date (t=0)
-         * @param instruments Sorted list of market instruments to bootstrap from.
-         * @param dc Day counting strategy function (defaults to Act/365)
-         * @param interp Interpolation strategy function (defaults to Linear)
-         * @throws std::invalid_argument if instruments are not sorted or invalid.
          */
-        YieldCurve(Date reference_date, std::span<const CurveInput> instruments, DayCounterFn dc = nullptr, InterpolatorFn interp = nullptr);
+        YieldCurve(Date reference_date, std::span<const CurveInput> instruments, 
+                   DC dc = DC(), Interp interp = Interp());
 
         /**
          * @brief Calculates discount factor for a specific date.
@@ -58,11 +62,14 @@ namespace GreekCore {
         std::vector<double> times_;    // Grid points (x) - Year Fractions
         std::vector<double> log_dfs_;  // Log Discount Factors (y)
         
-        DayCounterFn dc_;
-        InterpolatorFn interp_;
+        DC day_count_convention_;
+        Interp interpolator_;
 
         void bootstrapPoint(const CurveInput& instr, double T);
     };
+
+    // Deduction Guide: Allows YieldCurve(date, instruments) to deduce default template args
+    YieldCurve(Date, std::span<const CurveInput>) -> YieldCurve<DefaultDayCounter, LinearInterpolator>;
 }
 
 #endif // GREEKCORE_YIELDCURVE_H

@@ -1,5 +1,6 @@
 #include "GreekCore/Rates/Tenor.h"
 #include "GreekCore/Time/Date.h"
+#include "GreekCore/Time/Calendar.h"
 #include <stdexcept>
 #include <string>
 #include <cctype>
@@ -9,6 +10,11 @@ namespace GreekCore::Rates {
     Tenor Tenor::parse(std::string_view s) {
         if (s.empty()) throw std::invalid_argument("Empty tenor string");
         
+        // Handle special conventions: O/N (Overnight), T/N (Tom-Next), S/N (Spot-Next)
+        if (s == "ON" || s == "O/N" || s == "TN" || s == "T/N" || s == "SN" || s == "S/N") {
+            return {1, TimeUnit::Days};
+        }
+
         size_t unit_pos = 0;
         while (unit_pos < s.size() && std::isdigit(s[unit_pos])) {
             unit_pos++;
@@ -50,5 +56,12 @@ namespace GreekCore::Rates {
             return Date{ymd + months(amount)};
         }
         return start;
+    }
+
+    GreekCore::Time::Date Tenor::add_to(const GreekCore::Time::Date& start, 
+                                        GreekCore::Time::BusinessDayConvention convention,
+                                        std::function<bool(GreekCore::Time::Date)> calendar) const {
+        GreekCore::Time::Date unadjusted = add_to(start);
+        return GreekCore::Time::adjust(unadjusted, convention, calendar);
     }
 }

@@ -111,7 +111,7 @@ namespace GreekCore {
         }
 
     public:
-        // Templated European Pricer (With Gatherer) - Chapter 5 Style
+        // Templated European Pricer (With Gatherer)
         template<typename PayoffType>
         static void priceEuropean(double S0, const Parameters& r, const Parameters& sigma, double T, 
                                   size_t paths, const PayoffType& payoff, StatisticsMC& gatherer) {

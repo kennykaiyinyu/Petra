@@ -4,7 +4,9 @@
 #include <string>
 #include <stdexcept>
 #include <cctype>
+#include <functional>
 #include "../Time/Date.h"
+#include "GreekCore/Time/Calendar.h"
 
 namespace GreekCore::Rates {
 
@@ -27,6 +29,13 @@ namespace GreekCore::Rates {
          * Simple implementation: Does NOT handle business day rolling (must be done by Calendar).
          */
         GreekCore::Time::Date add_to(const GreekCore::Time::Date& start) const;
+
+        /**
+         * @brief Adds the tenor to a Date and adjusts the result using the business day convention.
+         */
+        GreekCore::Time::Date add_to(const GreekCore::Time::Date& start, 
+                                     GreekCore::Time::BusinessDayConvention convention,
+                                     std::function<bool(GreekCore::Time::Date)> calendar) const;
     };
 }
 #endif
