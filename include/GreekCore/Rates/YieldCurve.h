@@ -39,10 +39,7 @@ namespace GreekCore {
          * @param interp Interpolation strategy function (defaults to Linear)
          * @throws std::invalid_argument if instruments are not sorted or invalid.
          */
-        YieldCurve(Date reference_date, 
-                   std::span<const CurveInput> instruments,
-                   DayCounterFn dc = nullptr, 
-                   InterpolatorFn interp = nullptr);
+        YieldCurve(Date reference_date, std::span<const CurveInput> instruments, DayCounterFn dc = nullptr, InterpolatorFn interp = nullptr);
 
         /**
          * @brief Calculates discount factor for a specific date.

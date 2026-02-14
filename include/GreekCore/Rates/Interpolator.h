@@ -10,7 +10,7 @@
 namespace GreekCore {
 
     /**
-     * @brief Concept to ensure the strategy pattern is followed at compile-time.
+     * @brief Concept to ensure the strategy pattern is followed at ***compile-time***.
      */
     template<typename T>
     concept InterpolationStrategy = requires(T t, double x, std::span<const double> x_vals, std::span<const double> y_vals) {

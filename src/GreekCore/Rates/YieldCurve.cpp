@@ -16,14 +16,9 @@ namespace GreekCore {
         return LinearInterpolator::interpolate(x, x_vals, y_vals);
     }
 
-    YieldCurve::YieldCurve(Date reference_date,
-                           std::span<const CurveInput> instruments,
-                           DayCounterFn dc,
-                           InterpolatorFn interp)
-        : ref_date_(reference_date), 
-          dc_(dc ? std::move(dc) : defaultDayCounter),
-          interp_(interp ? std::move(interp) : defaultInterpolator)
-    {
+    YieldCurve::YieldCurve(Date reference_date, std::span<const CurveInput> instruments, DayCounterFn dc, InterpolatorFn interp)
+        : ref_date_(reference_date), dc_(dc ? std::move(dc) : defaultDayCounter), interp_(interp ? std::move(interp) : defaultInterpolator) {
+            
         // Initialize with today: t=0, DF=1.0 => log_df=0.0
         times_.reserve(instruments.size() + 1);
         log_dfs_.reserve(instruments.size() + 1);
