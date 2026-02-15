@@ -1,6 +1,22 @@
 #ifndef GREEKCORE_MONTECARLO_H
 #define GREEKCORE_MONTECARLO_H
 
+/**
+ * @file MonteCarlo.h
+ * @brief High-Performance Monte Carlo Pricing Engine.
+ * 
+ * @cite This implementation includes design patterns and concepts from:
+ *       Joshi, M. S. (2008). "C++ Design Patterns and Derivatives Pricing" (2nd ed.). 
+ *       Cambridge University Press.
+ *       - Chapter 1: A Simple Monte Carlo Model (Basic Structure)
+ *       - Chapter 2: Encapsulation (Payoff/Engine separation)
+ *       - Chapter 5: Statistics Gatherer (StatisticsMC)
+ *       - Chapter 6: Random Number Generation (Bridge Pattern for Parameters)
+ * 
+ * @details Modifies the original extensive inheritance hierarchies to use 
+ *          modern C++ features (Templates, std::function, std::future) for performance.
+ */
+
 #include <vector>
 #include <random>
 #include <cmath>

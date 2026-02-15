@@ -1,6 +1,11 @@
 #ifndef GREEKCORE_STATISTICS_H
 #define GREEKCORE_STATISTICS_H
 
+/**
+ * @cite Based on "Statistics Gatherer" Pattern - Chapter 5.
+ *       Joshi, M. S. (2008). "C++ Design Patterns and Derivatives Pricing".
+ */
+
 #include <vector>
 #include <memory>
 #include <cmath>
