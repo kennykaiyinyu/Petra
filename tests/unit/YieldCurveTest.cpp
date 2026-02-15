@@ -4,6 +4,7 @@
 #include "GreekCore/Time/DayCounter.h"
 #include <vector>
 #include <cmath>
+#include <chrono>
 
 using namespace GreekCore;
 using namespace GreekCore::Time;
@@ -88,4 +89,46 @@ TEST_F(YieldCurveTest, HandlesFRA) {
     
     // Check that the curve bootstrapped successfully
     EXPECT_NO_THROW(auto x = curve.getDiscountFactor(d_9m));
+}
+
+TEST_F(YieldCurveTest, BootstrapsRealWorldData) {
+    // Representative USD SOFR Curve Data (Inverted Curve Example)
+    // Reference Date: Oct 27, 2023
+    Date refDate = make_date(2023, 10, 27);
+
+    auto add_months = [](Date d, int n) {
+        using namespace std::chrono;
+        year_month_day ymd{d};
+        return Date{ymd + months(n)};
+    };
+    
+    auto add_years = [](Date d, int n) {
+        using namespace std::chrono;
+        year_month_day ymd{d};
+        return Date{ymd + years(n)};
+    };
+
+    std::vector<CurveInput> market_instruments = {
+        // Deposits (Short End - Higher Rates)
+        {InstrumentType::Deposit, 0.0532, add_months(refDate, 1), refDate, 0},
+        {InstrumentType::Deposit, 0.0535, add_months(refDate, 3), refDate, 0},
+        {InstrumentType::Deposit, 0.0540, add_months(refDate, 6), refDate, 0},
+        // Swaps (Long End - Inverted/Lower Rates, Annual Freq)
+        {InstrumentType::Swap,    0.0520, add_years(refDate, 1),  refDate, 1},
+        {InstrumentType::Swap,    0.0480, add_years(refDate, 2),  refDate, 1},
+        {InstrumentType::Swap,    0.0440, add_years(refDate, 5),  refDate, 1},
+        {InstrumentType::Swap,    0.0430, add_years(refDate, 10), refDate, 1},
+        {InstrumentType::Swap,    0.0420, add_years(refDate, 30), refDate, 1}
+    };
+
+    YieldCurve curve(refDate, market_instruments);
+
+    // Verify 2Y Swap Repricing
+    // Par Swap Equation: Coupon * Sum(DF_i) + DF_n = 1.0
+    double C = 0.0480;
+    double df_1y = curve.getDiscountFactor(market_instruments[3].maturity_date);
+    double df_2y = curve.getDiscountFactor(market_instruments[4].maturity_date);
+    
+    double pv = C * df_1y + (1.0 + C) * df_2y;
+    EXPECT_NEAR(pv, 1.0, 1e-6);
 }

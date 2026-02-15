@@ -39,7 +39,9 @@ namespace GreekCore {
         // Core engine that pushes results to a Gatherer
         template<typename PayoffType>
         static void runSimulation(double S0, const Parameters& r, const Parameters& sigma, double T, 
-                                  size_t paths, const PayoffType& payoff, StatisticsMC& gatherer) {
+                                  size_t paths, const PayoffType& payoff, StatisticsMC& gatherer,
+                                  std::function<void(double current_price, double current_stderr, size_t paths_done)> on_progress = nullptr,
+                                  size_t progress_interval = 1000) {
             
             double r_integral = r.integral(0.0, T);
             double vol_sq_integral = sigma.integralSquare(0.0, T);
@@ -65,6 +67,14 @@ namespace GreekCore {
                 double val = payoff(ST);
 
                 gatherer.dumpOneResult(val * df);
+
+                // Report Progress
+                if (on_progress && (i + 1) % progress_interval == 0) {
+                    auto res = gatherer.getResultsSoFar(); 
+                    if (!res.empty() && !res[0].empty()) {
+                        on_progress(res[0][0], res.size() > 1 && !res[1].empty() ? res[1][0] : 0.0, i + 1);
+                    }
+                }
             }
         }
 

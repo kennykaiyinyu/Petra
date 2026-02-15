@@ -21,6 +21,7 @@ set(SOURCES
     src/GreekCore/Time/Date.cpp
     src/GreekCore/Time/Calendar.cpp
     src/GreekCore/Time/DayCounter.cpp
+    src/GreekCore/Time/NYSECalendar.cpp
 )
 
 # --- Component Library ---
@@ -73,3 +74,9 @@ endif()
 # Example showing the Bridge logic from screenshots
 add_executable(BridgeUsage examples/BridgeUsage.cpp)
 target_link_libraries(BridgeUsage PRIVATE GreekCore)
+
+add_executable(YieldCurveDemo examples/YieldCurveDemo.cpp)
+
+target_link_libraries(YieldCurveDemo PRIVATE GreekCore)
+
+

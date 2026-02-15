@@ -4,9 +4,15 @@
 
 namespace GreekCore {
 
+    /// @brief Construct a new Yield Curve object and bootstrap it immediately.
+    /// @tparam DC The Day Count Strategy type (e.g., Actual365Fixed).
+    /// @tparam Interp The Interpolation Strategy type (e.g., LinearInterpolator).
+    /// @param reference_date The anchor date (t=0) for the curve.
+    /// @param instruments A sorted span of market instruments (Deposits, FRAs, Swaps) used for bootstrapping.
+    /// @param dc Instance of the day count strategy.
+    /// @param interp Instance of the interpolation strategy.
     template<DayCountStrategy DC, InterpolatorStrategy Interp>
-    YieldCurve<DC, Interp>::YieldCurve(Date reference_date, std::span<const CurveInput> instruments, 
-                                       DC dc, Interp interp)
+    YieldCurve<DC, Interp>::YieldCurve(Date reference_date, std::span<const CurveInput> instruments, DC dc, Interp interp)
         : ref_date_(reference_date), day_count_convention_(std::move(dc)), interpolator_(std::move(interp)) {
         
         // Initialize with today: t=0, DF=1.0 => log_df=0.0
@@ -15,25 +21,31 @@ namespace GreekCore {
         times_.push_back(0.0);
         log_dfs_.push_back(0.0);
 
-        // Run Bootstrap immediately
+        // To follow RAII pattern: Run Bootstrap immediately
         for (const auto& instr : instruments) {
-            double T = day_count_convention_(ref_date_, instr.maturity_date);
+            double t_i = day_count_convention_(ref_date_, instr.maturity_date);
 
-            if (T <= times_.back()) {
+            if (t_i <= times_.back()) { [[unlikely]]
                 throw std::invalid_argument("Instruments must be sorted by maturity");
             }
 
-            bootstrapPoint(instr, T);
+            bootstrapPoint(instr, t_i);
         }
     }
 
+    /// @brief Calculates the discount factor for a specific date.
+    /// @param d The target date.
+    /// @return The discount factor P(0, d).
+    /// @throws std::invalid_argument if d < reference_date.
     template<DayCountStrategy DC, InterpolatorStrategy Interp>
     double YieldCurve<DC, Interp>::getDiscountFactor(Date d) const {
         if (d < ref_date_) throw std::invalid_argument("Date cannot be before reference date");
-        double t = day_count_convention_(ref_date_, d);
-        return getDiscountFactor(t);
+        return getDiscountFactor(day_count_convention_(ref_date_, d));
     }
 
+    /// @brief Calculates the discount factor for a specific time fraction.
+    /// @param t Time in years from reference date.
+    /// @return The discount factor e^(-r*t).
     template<DayCountStrategy DC, InterpolatorStrategy Interp>
     double YieldCurve<DC, Interp>::getDiscountFactor(double t) const {
         // Log-Linear Interpolation: Interpolate on Log DFs, then Exp
@@ -42,19 +54,29 @@ namespace GreekCore {
         return std::exp(log_df);
     }
 
+    /// @brief Calculates the continuously compounded zero rate for a specific date.
+    /// @param d The target date.
+    /// @return The annualized zero rate.
     template<DayCountStrategy DC, InterpolatorStrategy Interp>
     double YieldCurve<DC, Interp>::getZeroRate(Date d) const {
-        double t = day_count_convention_(ref_date_, d);
-        return getZeroRate(t);
+        return getZeroRate(day_count_convention_(ref_date_, d));
     }
 
+    /// @brief Calculates the continuously compounded zero rate for a specific time fraction.
+    /// @param t Time in years from reference date.
+    /// @return The annualized zero rate.
     template<DayCountStrategy DC, InterpolatorStrategy Interp>
     double YieldCurve<DC, Interp>::getZeroRate(double t) const {
-        if (t < 1e-8) return -log_dfs_[0];
-        double df = getDiscountFactor(t);
-        return -std::log(df) / t;
+        if (t < 1e-8) {  [[unlikely]]
+            return -log_dfs_[0]; 
+        }
+        return -std::log(getDiscountFactor(t)) / t;
     }
 
+    /// @brief Internal helper to bootstrap a single instrument onto the curve.
+    /// Solves for the zero rate/discount factor that prices the instrument at par.
+    /// @param instr The market instrument (Deposit, FRA, Swap).
+    /// @param T The maturity time of the instrument in years.
     template<DayCountStrategy DC, InterpolatorStrategy Interp>
     void YieldCurve<DC, Interp>::bootstrapPoint(const CurveInput& instr, double T) {
         double R = instr.rate;
@@ -116,5 +138,8 @@ namespace GreekCore {
     }
 
     // Explicit Instantiation for the default types used in tests/applications
-    template class YieldCurve<DefaultDayCounter, LinearInterpolator>;
+    template class YieldCurve<Act365DayCounter, LinearInterpolator>;
+    template class YieldCurve<Act360DayCounter, LinearInterpolator>;
+    template class YieldCurve<ActActDayCounter, LinearInterpolator>;
+    template class YieldCurve<Thirty360DayCounter, LinearInterpolator>;
 }

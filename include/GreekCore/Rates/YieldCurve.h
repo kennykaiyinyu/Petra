@@ -36,7 +36,7 @@ namespace GreekCore {
      * @brief High-Performance Yield Curve using SoA layout.
      * Templated on strategies for maximum compiler optimization (inlining).
      */
-    template<DayCountStrategy DC = DefaultDayCounter, InterpolatorStrategy Interp = LinearInterpolator>
+    template<DayCountStrategy DC = Act365DayCounter, InterpolatorStrategy Interp = LinearInterpolator>
     class YieldCurve {
     public:
         /**
@@ -69,7 +69,7 @@ namespace GreekCore {
     };
 
     // Deduction Guide: Allows YieldCurve(date, instruments) to deduce default template args
-    YieldCurve(Date, std::span<const CurveInput>) -> YieldCurve<DefaultDayCounter, LinearInterpolator>;
+    YieldCurve(Date, std::span<const CurveInput>) -> YieldCurve<Act365DayCounter, LinearInterpolator>;
 }
 
 #endif // GREEKCORE_YIELDCURVE_H

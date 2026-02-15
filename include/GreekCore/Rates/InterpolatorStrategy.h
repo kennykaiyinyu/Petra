@@ -23,8 +23,12 @@ namespace GreekCore {
      */
     struct LinearInterpolator {
 
-        [[nodiscard]]
-        static double interpolate(double x, std::span<const double> x_vals, std::span<const double> y_vals) {
+        /// @brief Interpolate for y at given x.
+        /// @param x 
+        /// @param x_vals 
+        /// @param y_vals 
+        /// @return 
+        [[nodiscard]] static double interpolate(double x, std::span<const double> x_vals, std::span<const double> y_vals) {
             if (x_vals.size() != y_vals.size() || x_vals.empty()) [[unlikely]] {
                 throw std::invalid_argument("Size mismatch or empty vectors");
             }
@@ -41,12 +45,12 @@ namespace GreekCore {
             
             size_t i = std::distance(x_vals.begin(), it) - 1;
 
-            double x1 = x_vals[i];
-            double x2 = x_vals[i + 1];
-            double y1 = y_vals[i];
-            double y2 = y_vals[i + 1];
+            auto x1 = x_vals[i];
+            auto x2 = x_vals[i + 1];
+            auto y1 = y_vals[i];
+            auto y2 = y_vals[i + 1];
 
-            double slope = (y2 - y1) / (x2 - x1);
+            auto slope = (y2 - y1) / (x2 - x1);
             return y1 + (x - x1) * slope;
         }
     };
