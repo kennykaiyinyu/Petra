@@ -20,15 +20,23 @@ namespace GreekCore {
 
     /**
      * @brief Linear Interpolation with Flat Extrapolation.
+     * 
+     * Uses binary search to find the interval and interpolates linearly.
+     * Extrapolates flat (constant) beyond the first and last points.
      */
     struct LinearInterpolator {
 
-        /// @brief Interpolate for y at given x.
-        /// @param x 
-        /// @param x_vals 
-        /// @param y_vals 
-        /// @return 
-        [[nodiscard]] static double interpolate(double x, std::span<const double> x_vals, std::span<const double> y_vals) {
+        /**
+         * @brief Interpolates $y$ at a given point $x$.
+         * 
+         * @param x The query point.
+         * @param x_vals Monotonically increasing independent variable values.
+         * @param y_vals Dependent variable values corresponding to x_vals.
+         * @return The interpolated value.
+         * @throws std::invalid_argument If arrays are empty or sizes differ.
+         */
+        [[nodiscard]] 
+        static double interpolate(double x, std::span<const double> x_vals, std::span<const double> y_vals) {
             if (x_vals.size() != y_vals.size() || x_vals.empty()) [[unlikely]] {
                 throw std::invalid_argument("Size mismatch or empty vectors");
             }
@@ -41,6 +49,7 @@ namespace GreekCore {
                 return y_vals.back();
             }
 
+            // Find first element strictly greater than x
             auto it = std::upper_bound(x_vals.begin(), x_vals.end(), x);
             
             size_t i = std::distance(x_vals.begin(), it) - 1;

@@ -10,25 +10,50 @@ namespace GreekCore {
 
     enum class OptionType { Call, Put };
 
-    // CRTP Base Class - Enforces interface at compile time without vtables
-    // Contract: The specific option logic and parameters (Strike, Barrier, etc.)
-    // MarketParameters: The market data required to evaluate the payoff (Spot, Path, etc.)
+    /**
+     * @brief CRTP Base Class for Payoff definitions.
+     * 
+     * Uses the Curiously Recurring Template Pattern (CRTP) to enforce the interface
+     * at compile-time, avoiding virtual function overhead for high performance.
+     * 
+     * @tparam Derived The concrete payoff implementation.
+     * @tparam MarketParameters The type of market data required (e.g., `double` for European, `std::vector<double>` for Asian).
+     */
     template<typename Derived, typename MarketParameters>
     class PayOff {
     public:
+        /**
+         * @brief Evaluates the payoff for a given market scenario.
+         * Delegates to the derived class's implementation.
+         */
         [[nodiscard]] double operator()(const MarketParameters& market_data) const {
             return static_cast<const Derived*>(this)->implementation(market_data);
         }
         PayOff() = default;
     };
 
-    // Vanilla Option (Call/Put)
-    // Depends on a single spot price (double)
+    /**
+     * @brief A standard European option payoff (Call/Put).
+     * 
+     * Payoff depends only on the terminal spot price $S_T$.
+     * $ P(S_T) = \max(S_T - K, 0) $ for Calls, or $\max(K - S_T, 0)$ for Puts.
+     */
     class PayOffVanilla : public PayOff<PayOffVanilla, double> {
         OptionType m_type;
         double m_strike;
     public:
+        /**
+         * @brief Constructs a Vanilla Option Payoff.
+         * @param type Call or Put.
+         * @param strike Strike price K.
+         */
         PayOffVanilla(OptionType type, double strike) : m_type(type), m_strike(strike) {}
+
+        /**
+         * @brief Evaluates the payoff at maturity.
+         * @param spot The final spot price $S_T$.
+         * @return The intrinsic value of the option.
+         */
         [[nodiscard]] double implementation(double spot) const;
     };
 

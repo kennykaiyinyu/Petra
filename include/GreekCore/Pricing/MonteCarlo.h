@@ -31,19 +31,25 @@
 
 namespace GreekCore {
 
+    /**
+     * @brief Structure to hold Monte Carlo simulation results including price, Greeks, and statistics.
+     */
     struct MonteCarloResult {
-        double price;
-        double delta;
-        double gamma;
-        double theta;
-        double vega;
-        double rho;
-        double error_estimate;
-        double runtime_ms;
+        double price;          ///< Estimated option price.
+        double delta;          ///< Sensitivity to spot ($\partial V / \partial S$).
+        double gamma;          ///< Sensitivity to delta ($\partial^2 V / \partial S^2$).
+        double theta;          ///< Sensitivity to time decay ($\partial V / \partial t$).
+        double vega;           ///< Sensitivity to volatility ($\partial V / \partial \sigma$).
+        double rho;            ///< Sensitivity to interest rate ($\partial V / \partial r$).
+        double error_estimate; ///< Standard error of the mean estimate ($\sigma_{sample} / \sqrt{N}$).
+        double runtime_ms;     ///< Execution time in milliseconds.
     };
 
     /**
-     * @brief High-Performance Monte Carlo Engine.
+     * @brief High-Performance Monte Carlo Pricing Engine.
+     * 
+     * Uses template functions and lambdas to support arbitrary payoffs without virtual function overhead.
+     * Implements Black-Scholes dynamics simulation to price European options and calculate Greeks.
      */
     class MonteCarloPricer {
     private:

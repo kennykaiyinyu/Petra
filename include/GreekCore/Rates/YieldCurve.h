@@ -21,40 +21,60 @@ namespace GreekCore {
     };
 
     /**
-     * @brief Curve Input Definition.
-     * Defined by a concrete date, rate, and frequency.
+     * @brief Represents a market instrument used for curve construction.
+     * 
+     * Defined by its type, rate, maturity, and payment frequency.
      */
     struct CurveInput {
-        InstrumentType type;
-        double rate;          // Annualized Par Rate (e.g., 0.05)
-        Date maturity_date; 
-        Date start_date;      // Required. For Spot instruments, set to reference date.
-        int frequency;        // 0 = Simple/Zero, 1,2,4 = Swap payments per year
+        InstrumentType type;  ///< Instrument classification (Deposit, FRA, Swap).
+        double rate;          ///< Annualized Par Rate (e.g., 0.05 for 5%).
+        Date maturity_date;   ///< The date when the final payment occurs.
+        Date start_date;      ///< The validation/start date (e.g., Spot Date for deposits).
+        int frequency;        ///< Payment frequency per year (0 = Simple Interest/Zero, 1 = Annual, 2 = Semiannual).
     };
 
     /**
-     * @brief High-Performance Yield Curve using SoA layout.
-     * Templated on strategies for maximum compiler optimization (inlining).
+     * @brief High-Performance Yield Curve implementation using Structure of Arrays (SoA).
+     * 
+     * Uses template strategies for Day Count and Interpolation to maximize compile-time inlining.
+     * Implements bootstrapping from market instruments (Deposits, FRAs, Swaps).
+     * 
+     * @tparam DC Day Count Strategy satisfying `DayCountStrategy` concept.
+     * @tparam Interp Interpolation Strategy satisfying `InterpolatorStrategy` concept.
      */
     template<DayCountStrategy DC = Act365DayCounter, InterpolatorStrategy Interp = LinearInterpolator>
     class YieldCurve {
     public:
         /**
-         * @brief Construct a new Yield Curve object (RAII).
+         * @brief Constructs a Yield Curve by bootstrapping from market instruments.
+         * 
+         * @param reference_date The curve's base date ($t=0$).
+         * @param instruments A span of calibration instruments (must be sorted by maturity).
+         * @param dc Day count convention instance.
+         * @param interp Interpolation strategy instance.
          */
         YieldCurve(Date reference_date, std::span<const CurveInput> instruments, 
                    DC dc = DC(), Interp interp = Interp());
 
         /**
-         * @brief Calculates discount factor for a specific date.
+         * @brief Calculates the discount factor $P(0, T)$ for a specific date.
          */
         [[nodiscard]] double getDiscountFactor(Date d) const;
+        
+        /**
+         * @brief Calculates the discount factor $P(0, T)$ for a specific time $T$.
+         */
         [[nodiscard]] double getDiscountFactor(double t) const;
 
         /**
-         * @brief Calculates zero rate for a specific date/time.
+         * @brief Calculates zero rate $R(0, T)$ for a specific date.
+         * $P(0, T) = e^{-R(0, T) \cdot T}$
          */
         [[nodiscard]] double getZeroRate(Date d) const;
+        
+        /**
+         * @brief Calculates zero rate $R(0, T)$ for a specific time $T$.
+         */
         [[nodiscard]] double getZeroRate(double t) const;
 
     private:
