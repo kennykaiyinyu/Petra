@@ -1,0 +1,25 @@
+# Doxyfile 1.9.1
+
+PROJECT_NAME           = "Petra (GreekCore)"
+PROJECT_BRIEF          = "High-Performance C++20 Pricing Engine for HFT"
+OUTPUT_DIRECTORY       = docs
+INPUT                  = include src
+RECURSIVE              = YES
+FILE_PATTERNS          = *.h *.cpp *.hpp
+generate_latex         = NO
+generate_html          = YES
+HTML_OUTPUT            = html
+
+# Modern C++ Features
+EXTENSION_MAPPING      = h=C++ cpp=C++
+CPP_CLI_SUPPORT        = YES
+
+# Visual Style
+HAVE_DOT               = YES
+UML_LOOK               = YES
+TEMPLATE_RELATIONS     = YES
+CALL_GRAPH             = YES
+
+# Math Support (Critical for your formulas)
+USE_MATHJAX            = YES
+MATHJAX_RELPATH        = https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
