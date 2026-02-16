@@ -1,5 +1,3 @@
-<map id="GreekCore::StatisticsThreadSafe" name="GreekCore::StatisticsThreadSafe">
-<area shape="rect" id="Node000001" title="Thread&#45;Safe Decorator for Statistics Gatherer." alt="" coords="5,199,231,344"/>
-<area shape="rect" id="Node000002" href="$classGreekCore_1_1StatisticsMC.html" title="Statistics Gatherer Interface (Chapter 5)" alt="" coords="32,5,204,151"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="121,164,121,198,115,198,115,164"/>
+<map id="GreekCore::StatisticsThreadSafe&lt; InnerGatherer &gt;" name="GreekCore::StatisticsThreadSafe&lt; InnerGatherer &gt;">
+<area shape="rect" id="Node000001" title="Thread&#45;Safe Decorator (Mutex Protected)" alt="" coords="5,5,201,205"/>
 </map>

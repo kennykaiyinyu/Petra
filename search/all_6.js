@@ -8,6 +8,7 @@ var searchData=
   ['greekcore_5',['GreekCore',['../namespaceGreekCore.html',1,'']]],
   ['greekcore_3a_3adaycountstrategy_6',['DayCountStrategy',['../conceptGreekCore_1_1DayCountStrategy.html',1,'GreekCore']]],
   ['greekcore_3a_3ainterpolatorstrategy_7',['InterpolatorStrategy',['../conceptGreekCore_1_1InterpolatorStrategy.html',1,'GreekCore']]],
-  ['greekcore_3a_3atime_3a_3acalendarstrategy_8',['CalendarStrategy',['../conceptGreekCore_1_1Time_1_1CalendarStrategy.html',1,'GreekCore::Time']]],
-  ['greekcore_3a_3atime_3a_3adaycounterstrategy_9',['DayCounterStrategy',['../conceptGreekCore_1_1Time_1_1DayCounterStrategy.html',1,'GreekCore::Time']]]
+  ['greekcore_3a_3astatisticsgatherer_8',['StatisticsGatherer',['../conceptGreekCore_1_1StatisticsGatherer.html',1,'GreekCore']]],
+  ['greekcore_3a_3atime_3a_3acalendarstrategy_9',['CalendarStrategy',['../conceptGreekCore_1_1Time_1_1CalendarStrategy.html',1,'GreekCore::Time']]],
+  ['greekcore_3a_3atime_3a_3adaycounterstrategy_10',['DayCounterStrategy',['../conceptGreekCore_1_1Time_1_1DayCounterStrategy.html',1,'GreekCore::Time']]]
 ];

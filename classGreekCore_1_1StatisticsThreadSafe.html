@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Petra (GreekCore): GreekCore::StatisticsThreadSafe Class Reference</title>
+<title>Petra (GreekCore): GreekCore::StatisticsThreadSafe&lt; InnerGatherer &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -84,137 +84,52 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classGreekCore_1_1StatisticsThreadSafe-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">GreekCore::StatisticsThreadSafe Class Reference</div></div>
+  <div class="headertitle"><div class="title">GreekCore::StatisticsThreadSafe&lt; InnerGatherer &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Thread-Safe Decorator for Statistics Gatherer.  
+<p>Thread-Safe Decorator (Mutex Protected)  
  <a href="classGreekCore_1_1StatisticsThreadSafe.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="Statistics_8h_source.html">Statistics.h</a>&gt;</code></p>
 <div class="dynheader">
-Inheritance diagram for GreekCore::StatisticsThreadSafe:</div>
+Collaboration diagram for GreekCore::StatisticsThreadSafe&lt; InnerGatherer &gt;:</div>
 <div class="dyncontent">
-<div class="center"><img src="classGreekCore_1_1StatisticsThreadSafe__inherit__graph.png" border="0" usemap="#aGreekCore_1_1StatisticsThreadSafe_inherit__map" alt="Inheritance graph"/></div>
-<map name="aGreekCore_1_1StatisticsThreadSafe_inherit__map" id="aGreekCore_1_1StatisticsThreadSafe_inherit__map">
-<area shape="rect" title="Thread&#45;Safe Decorator for Statistics Gatherer." alt="" coords="5,199,231,344"/>
-<area shape="rect" href="classGreekCore_1_1StatisticsMC.html" title="Statistics Gatherer Interface (Chapter 5)" alt="" coords="32,5,204,151"/>
-<area shape="poly" title=" " alt="" coords="121,164,121,198,115,198,115,164"/>
-</map>
-</div>
-<div class="dynheader">
-Collaboration diagram for GreekCore::StatisticsThreadSafe:</div>
-<div class="dyncontent">
-<div class="center"><img src="classGreekCore_1_1StatisticsThreadSafe__coll__graph.png" border="0" usemap="#aGreekCore_1_1StatisticsThreadSafe_coll__map" alt="Collaboration graph"/></div>
-<map name="aGreekCore_1_1StatisticsThreadSafe_coll__map" id="aGreekCore_1_1StatisticsThreadSafe_coll__map">
-<area shape="rect" title="Thread&#45;Safe Decorator for Statistics Gatherer." alt="" coords="5,199,231,344"/>
-<area shape="rect" href="classGreekCore_1_1StatisticsMC.html" title="Statistics Gatherer Interface (Chapter 5)" alt="" coords="32,5,204,151"/>
-<area shape="poly" title=" " alt="" coords="121,164,121,198,115,198,115,164"/>
+<div class="center"><img src="classGreekCore_1_1StatisticsThreadSafe__coll__graph.png" border="0" usemap="#aGreekCore_1_1StatisticsThreadSafe_3_01InnerGatherer_01_4_coll__map" alt="Collaboration graph"/></div>
+<map name="aGreekCore_1_1StatisticsThreadSafe_3_01InnerGatherer_01_4_coll__map" id="aGreekCore_1_1StatisticsThreadSafe_3_01InnerGatherer_01_4_coll__map">
+<area shape="rect" title="Thread&#45;Safe Decorator (Mutex Protected)" alt="" coords="5,5,201,205"/>
 </map>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a7341784b23864ea1ae89dc2ebb856383" id="r_a7341784b23864ea1ae89dc2ebb856383"><td class="memItemLeft" align="right" valign="top"><a id="a7341784b23864ea1ae89dc2ebb856383" name="a7341784b23864ea1ae89dc2ebb856383"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>StatisticsThreadSafe</b> (std::unique_ptr&lt; <a class="el" href="classGreekCore_1_1StatisticsMC.html">StatisticsMC</a> &gt; <a class="el" href="classGreekCore_1_1YieldCurve.html">inner</a>)</td></tr>
-<tr class="separator:a7341784b23864ea1ae89dc2ebb856383"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad72ea060b203da1f024e2681b99ff15d" id="r_ad72ea060b203da1f024e2681b99ff15d"><td class="memItemLeft" align="right" valign="top"><a id="ad72ea060b203da1f024e2681b99ff15d" name="ad72ea060b203da1f024e2681b99ff15d"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>StatisticsThreadSafe</b> (<a class="el" href="classGreekCore_1_1YieldCurve.html">const</a> <a class="el" href="classGreekCore_1_1StatisticsThreadSafe.html">StatisticsThreadSafe</a> &amp;<a class="el" href="classGreekCore_1_1YieldCurve.html">other</a>)</td></tr>
-<tr class="separator:ad72ea060b203da1f024e2681b99ff15d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad71b48a460aee48c53411d89eac79637" id="r_ad71b48a460aee48c53411d89eac79637"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGreekCore_1_1YieldCurve.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGreekCore_1_1StatisticsThreadSafe.html#ad71b48a460aee48c53411d89eac79637">dumpOneResult</a> (<a class="el" href="classGreekCore_1_1YieldCurve.html">double</a> <a class="el" href="classGreekCore_1_1YieldCurve.html">result</a>) <a class="el" href="classGreekCore_1_1YieldCurve.html">override</a></td></tr>
-<tr class="separator:ad71b48a460aee48c53411d89eac79637"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a6f09df4c2222b318cc0a1fe89b5583" id="r_a9a6f09df4c2222b318cc0a1fe89b5583"><td class="memItemLeft" align="right" valign="top">std::vector&lt; std::vector&lt; <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGreekCore_1_1StatisticsThreadSafe.html#a9a6f09df4c2222b318cc0a1fe89b5583">getResultsSoFar</a> () <a class="el" href="classGreekCore_1_1YieldCurve.html">const</a> <a class="el" href="classGreekCore_1_1YieldCurve.html">override</a></td></tr>
-<tr class="separator:a9a6f09df4c2222b318cc0a1fe89b5583"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab234d053a463eb553d54645bd5ed961f" id="r_ab234d053a463eb553d54645bd5ed961f"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="classGreekCore_1_1StatisticsMC.html">StatisticsMC</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGreekCore_1_1StatisticsThreadSafe.html#ab234d053a463eb553d54645bd5ed961f">clone</a> () <a class="el" href="classGreekCore_1_1YieldCurve.html">const</a> <a class="el" href="classGreekCore_1_1YieldCurve.html">override</a></td></tr>
-<tr class="separator:ab234d053a463eb553d54645bd5ed961f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8194bd5431cb7e507411c0ed3a7f119a" id="r_a8194bd5431cb7e507411c0ed3a7f119a"><td class="memItemLeft" align="right" valign="top"><a id="a8194bd5431cb7e507411c0ed3a7f119a" name="a8194bd5431cb7e507411c0ed3a7f119a"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>StatisticsThreadSafe</b> (<a class="el" href="classGreekCore_1_1YieldCurve.html">const</a> InnerGatherer &amp;<a class="el" href="classGreekCore_1_1YieldCurve.html">inner</a>)</td></tr>
+<tr class="separator:a8194bd5431cb7e507411c0ed3a7f119a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac13b9e563fabf30f1a253b4a0508a630" id="r_ac13b9e563fabf30f1a253b4a0508a630"><td class="memItemLeft" align="right" valign="top"><a id="ac13b9e563fabf30f1a253b4a0508a630" name="ac13b9e563fabf30f1a253b4a0508a630"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>StatisticsThreadSafe</b> (InnerGatherer &amp;&amp;<a class="el" href="classGreekCore_1_1YieldCurve.html">inner</a>)</td></tr>
+<tr class="separator:ac13b9e563fabf30f1a253b4a0508a630"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75c6f75c659a081a312b84547f687fd2" id="r_a75c6f75c659a081a312b84547f687fd2"><td class="memItemLeft" align="right" valign="top"><a id="a75c6f75c659a081a312b84547f687fd2" name="a75c6f75c659a081a312b84547f687fd2"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>StatisticsThreadSafe</b> (<a class="el" href="classGreekCore_1_1StatisticsThreadSafe.html">StatisticsThreadSafe</a> &amp;&amp;<a class="el" href="classGreekCore_1_1YieldCurve.html">other</a>) <a class="el" href="classGreekCore_1_1YieldCurve.html">noexcept</a></td></tr>
+<tr class="separator:a75c6f75c659a081a312b84547f687fd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36a9eb9021870a02a824104e888ddb58" id="r_a36a9eb9021870a02a824104e888ddb58"><td class="memItemLeft" align="right" valign="top"><a id="a36a9eb9021870a02a824104e888ddb58" name="a36a9eb9021870a02a824104e888ddb58"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>StatisticsThreadSafe</b> (<a class="el" href="classGreekCore_1_1YieldCurve.html">const</a> <a class="el" href="classGreekCore_1_1StatisticsThreadSafe.html">StatisticsThreadSafe</a> &amp;)=<a class="el" href="classGreekCore_1_1YieldCurve.html">delete</a></td></tr>
+<tr class="separator:a36a9eb9021870a02a824104e888ddb58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6278001f020095a31fd5ffbcb612a834" id="r_a6278001f020095a31fd5ffbcb612a834"><td class="memItemLeft" align="right" valign="top"><a id="a6278001f020095a31fd5ffbcb612a834" name="a6278001f020095a31fd5ffbcb612a834"></a>
+<a class="el" href="classGreekCore_1_1StatisticsThreadSafe.html">StatisticsThreadSafe</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="classGreekCore_1_1YieldCurve.html">const</a> <a class="el" href="classGreekCore_1_1StatisticsThreadSafe.html">StatisticsThreadSafe</a> &amp;)=<a class="el" href="classGreekCore_1_1YieldCurve.html">delete</a></td></tr>
+<tr class="separator:a6278001f020095a31fd5ffbcb612a834"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e77913016983d81f359ab1f4082b0d1" id="r_a9e77913016983d81f359ab1f4082b0d1"><td class="memItemLeft" align="right" valign="top"><a id="a9e77913016983d81f359ab1f4082b0d1" name="a9e77913016983d81f359ab1f4082b0d1"></a>
+<a class="el" href="classGreekCore_1_1YieldCurve.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><b>dumpOneResult</b> (<a class="el" href="classGreekCore_1_1YieldCurve.html">double</a> <a class="el" href="classGreekCore_1_1YieldCurve.html">result</a>)</td></tr>
+<tr class="separator:a9e77913016983d81f359ab1f4082b0d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a37b669f3847060a122a4fb699b6d6dea" id="r_a37b669f3847060a122a4fb699b6d6dea"><td class="memItemLeft" align="right" valign="top"><a id="a37b669f3847060a122a4fb699b6d6dea" name="a37b669f3847060a122a4fb699b6d6dea"></a>
+std::vector&lt; std::vector&lt; <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getResultsSoFar</b> () <a class="el" href="classGreekCore_1_1YieldCurve.html">const</a></td></tr>
+<tr class="separator:a37b669f3847060a122a4fb699b6d6dea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Thread-Safe Decorator for Statistics Gatherer. </p>
-<p>Adds mutex protection to any <a class="el" href="classGreekCore_1_1StatisticsMC.html" title="Statistics Gatherer Interface (Chapter 5)">StatisticsMC</a> implementation. Useful when the gatherer is shared between an async worker and a monitoring thread. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="ab234d053a463eb553d54645bd5ed961f" name="ab234d053a463eb553d54645bd5ed961f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab234d053a463eb553d54645bd5ed961f">&#9670;&#160;</a></span>clone()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::unique_ptr&lt; <a class="el" href="classGreekCore_1_1StatisticsMC.html">StatisticsMC</a> &gt; GreekCore::StatisticsThreadSafe::clone </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="classGreekCore_1_1StatisticsMC.html">GreekCore::StatisticsMC</a>.</p>
-
-</div>
-</div>
-<a id="ad71b48a460aee48c53411d89eac79637" name="ad71b48a460aee48c53411d89eac79637"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad71b48a460aee48c53411d89eac79637">&#9670;&#160;</a></span>dumpOneResult()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classGreekCore_1_1YieldCurve.html">void</a> GreekCore::StatisticsThreadSafe::dumpOneResult </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classGreekCore_1_1YieldCurve.html">double</a>&#160;</td>
-          <td class="paramname"><em>result</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="classGreekCore_1_1StatisticsMC.html">GreekCore::StatisticsMC</a>.</p>
-
-</div>
-</div>
-<a id="a9a6f09df4c2222b318cc0a1fe89b5583" name="a9a6f09df4c2222b318cc0a1fe89b5583"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9a6f09df4c2222b318cc0a1fe89b5583">&#9670;&#160;</a></span>getResultsSoFar()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::vector&lt; std::vector&lt; <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a> &gt; &gt; GreekCore::StatisticsThreadSafe::getResultsSoFar </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Implements <a class="el" href="classGreekCore_1_1StatisticsMC.html">GreekCore::StatisticsMC</a>.</p>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<div class="textblock"><div class="compoundTemplParams">template&lt;StatisticsGatherer InnerGatherer&gt;<br />
+class GreekCore::StatisticsThreadSafe&lt; InnerGatherer &gt;</div><p>Thread-Safe Decorator (Mutex Protected) </p>
+<p>Wraps any StatisticsGatherer with a mutex to ensure thread safety when shared across threads. </p>
+</div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/GreekCore/Numerics/<a class="el" href="Statistics_8h_source.html">Statistics.h</a></li>
 </ul>
 </div><!-- contents -->

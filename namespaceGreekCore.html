@@ -141,14 +141,11 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGreekCore_1_1StatisticsConvergence.html">StatisticsConvergence</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Convergence Table Decorator (Joshi Chapter 5)  <a href="classGreekCore_1_1StatisticsConvergence.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGreekCore_1_1StatisticsMC.html">StatisticsMC</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Statistics Gatherer Interface (Chapter 5)  <a href="classGreekCore_1_1StatisticsMC.html#details">More...</a><br /></td></tr>
-<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGreekCore_1_1StatisticsMean.html">StatisticsMean</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Standard Mean and Standard Error Gatherer.  <a href="classGreekCore_1_1StatisticsMean.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGreekCore_1_1StatisticsThreadSafe.html">StatisticsThreadSafe</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread-Safe Decorator for Statistics Gatherer.  <a href="classGreekCore_1_1StatisticsThreadSafe.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Thread-Safe Decorator (Mutex Protected)  <a href="classGreekCore_1_1StatisticsThreadSafe.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structGreekCore_1_1Thirty360DayCounter.html">Thirty360DayCounter</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">30/360 Day Counter.  <a href="structGreekCore_1_1Thirty360DayCounter.html#details">More...</a><br /></td></tr>
@@ -168,6 +165,9 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="concepts" name="concepts"></a>
 Concepts</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptGreekCore_1_1StatisticsGatherer.html">StatisticsGatherer</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept for a Statistics Gatherer. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">concept &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="conceptGreekCore_1_1InterpolatorStrategy.html">InterpolatorStrategy</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Concept to ensure the strategy pattern is followed at <em><b>compile-time</b></em>. <br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -198,7 +198,8 @@ Functions</h2></td></tr>
 <tr class="separator:a0ab5a87b3f1d119552cb7ad65e8dba21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p><b>[Based]</b> on "Statistics Gatherer" Pattern - Chapter 5. Joshi, M. S. (2008). "C++ Design Patterns and Derivatives Pricing". </p>
+<div class="textblock"><p><b>[Based]</b> on "Statistics Gatherer" Pattern - Chapter 5. Joshi, M. S. (2008). "C++ Design Patterns and Derivatives Pricing".</p>
+<p>Refactored to use C++20 Concepts and Templates instead of Runtime Polymorphism. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
