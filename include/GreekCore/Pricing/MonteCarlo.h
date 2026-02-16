@@ -59,9 +59,9 @@ namespace GreekCore {
         };
 
         // Core engine that pushes results to a Gatherer
-        template<typename PayoffType>
+        template<typename PayoffType, StatisticsGatherer GathererType>
         static void runSimulation(double S0, const Parameters& r, const Parameters& sigma, double T, 
-                                  size_t paths, const PayoffType& payoff, StatisticsMC& gatherer,
+                                  size_t paths, const PayoffType& payoff, GathererType& gatherer,
                                   std::function<void(double current_price, double current_stderr, size_t paths_done)> on_progress = nullptr,
                                   size_t progress_interval = 1000) {
             
@@ -143,19 +143,19 @@ namespace GreekCore {
         }
 
     public:
-        // Templated European Pricer (With Gatherer)
-        template<typename PayoffType>
+        // Templated European Pricer (With Gatherer Concept)
+        template<typename PayoffType, StatisticsGatherer GathererType>
         static void priceEuropean(double S0, const Parameters& r, const Parameters& sigma, double T, 
-                                  size_t paths, const PayoffType& payoff, StatisticsMC& gatherer) {
+                                  size_t paths, const PayoffType& payoff, GathererType& gatherer) {
             runSimulation(S0, r, sigma, T, paths, payoff, gatherer);
         }
 
         // Templated European Pricer (Async) - References the gatherer
         // User (Caller) is responsible for ensuring 'gatherer' exists for the duration of the future.
-        template<typename PayoffType>
+        template<typename PayoffType, StatisticsGatherer GathererType>
         static std::future<void> priceEuropeanAsync(
             double S0, const Parameters& r, const Parameters& sigma, double T, 
-            size_t paths, const PayoffType& payoff, StatisticsMC& gatherer) 
+            size_t paths, const PayoffType& payoff, GathererType& gatherer) 
         {
             // Capture gatherer by reference. 
             // Note: We capture S0, r, sigma... by value to ensure they exist.

@@ -14,7 +14,7 @@ int main() {
     std::cout << "1. Bridge Pattern (Parameters)\n";
     std::cout << "2. Strategy Pattern (PayOff)\n";
     std::cout << "3. Wrapper Pattern (VanillaOption)\n";
-    std::cout << "4. Gatherer Pattern (StatisticsMC)\n\n";
+    std::cout << "4. Gatherer Pattern (StatisticsGatherer Concept)\n\n";
 
     double Spot = 100.0;
     double Strike = 100.0;

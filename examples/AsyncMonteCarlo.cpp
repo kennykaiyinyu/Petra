@@ -26,19 +26,21 @@ int main() {
     
     PayOffVanilla callPayoff(OptionType::Call, K);
 
-    // 1. Create the base gatherer (logic)
-    auto baseGatherer = std::make_unique<StatisticsMean>();
+    // 1. Create the base gatherer logic directly
+    // Using modern template-based approach (Stack allocation / Value semantics)
+    StatisticsMean baseGatherer; 
 
     // 2. Wrap via Decorator for Thread Safety
     // The pricers will write to this, and we will read from this.
-    auto safeGatherer = std::make_unique<StatisticsThreadSafe>(std::move(baseGatherer));
+    // StatisticsThreadSafe wraps StatisticsMean by value.
+    StatisticsThreadSafe<StatisticsMean> safeGatherer(std::move(baseGatherer));
 
     std::cout << "[Main] Launching Call Pricing Task (Async)..." << std::endl;
     
     // We pass the SAFE gatherer to the engine
-    // Note: We pass by REFERENCE (*safeGatherer). We own the pointer.
+    // Note: We pass by REFERENCE (safeGatherer). We own the object on the stack.
     auto callFuture = MonteCarloPricer::priceEuropeanAsync(
-        S0, r, sigma, T, paths, callPayoff, *safeGatherer
+        S0, r, sigma, T, paths, callPayoff, safeGatherer
     );
 
     std::cout << "[Main] Monitoring progress..." << std::endl;
@@ -47,7 +49,7 @@ int main() {
     // Monitor loop
     while (callFuture.wait_for(std::chrono::milliseconds(200)) != std::future_status::ready) {
         // Read interim results safely
-        auto results = safeGatherer->getResultsSoFar();
+        auto results = safeGatherer.getResultsSoFar();
         if (!results.empty() && !results[0].empty()) {
             double currentPrice = results[0][0];
             std::cout << "[Monitor] Current Estimate: " << currentPrice << std::endl;
@@ -59,9 +61,10 @@ int main() {
     std::cout << "[Main] Task complete." << std::endl;
     
     // Get final result ensures any exceptions are thrown
+    // Although future.get() is void here, it propagates exceptions.
     callFuture.get();
 
-    auto results = safeGatherer->getResultsSoFar();
+    auto results = safeGatherer.getResultsSoFar();
     double finalPrice = results[0][0];
 
     std::cout << "\n--- Final Result ---" << std::endl;
