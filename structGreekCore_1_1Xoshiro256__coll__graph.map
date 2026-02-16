@@ -1,0 +1,3 @@
+<map id="GreekCore::Xoshiro256" name="GreekCore::Xoshiro256">
+<area shape="rect" id="Node000001" title="Xoshiro256++ High Performance RNG. State size: 32 bytes (Fits in AVX registers). Period: 2^256 &#45; 1...." alt="" coords="5,5,169,151"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="GreekCore::StatisticsMC" name="GreekCore::StatisticsMC">
+<area shape="rect" id="Node000001" title="Statistics Gatherer Interface (Chapter 5)" alt="" coords="273,5,445,151"/>
+<area shape="rect" id="Node000002" href="$classGreekCore_1_1StatisticsConvergence.html" title="Convergence Table Decorator (Joshi Chapter 5)" alt="" coords="5,199,241,344"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="264,159,213,201,210,197,261,155"/>
+<area shape="rect" id="Node000003" href="$classGreekCore_1_1StatisticsMean.html" title="Standard Mean and Standard Error Gatherer." alt="" coords="266,209,453,334"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="362,164,362,208,357,208,357,164"/>
+<area shape="rect" id="Node000004" href="$classGreekCore_1_1StatisticsThreadSafe.html" title="Thread&#45;Safe Decorator for Statistics Gatherer." alt="" coords="477,199,703,344"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="458,158,505,196,502,200,455,162"/>
+</map>
