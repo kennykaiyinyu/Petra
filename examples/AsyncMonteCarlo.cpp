@@ -26,14 +26,10 @@ int main() {
     
     PayOffVanilla callPayoff(OptionType::Call, K);
 
-    // 1. Create the base gatherer logic directly
-    // Using modern template-based approach (Stack allocation / Value semantics)
-    StatisticsMean baseGatherer; 
-
-    // 2. Wrap via Decorator for Thread Safety
-    // The pricers will write to this, and we will read from this.
-    // StatisticsThreadSafe wraps StatisticsMean by value.
-    StatisticsThreadSafe<StatisticsMean> safeGatherer(std::move(baseGatherer));
+    // 1. Create the Lock-Free Gatherer directly
+    // This class uses std::atomic internally, so no Decorator/Mutex wrapper is needed.
+    // It is significantly faster for high-frequency updates.
+    StatisticsMeanLockFree safeGatherer; 
 
     std::cout << "[Main] Launching Call Pricing Task (Async)..." << std::endl;
     

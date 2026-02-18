@@ -12,6 +12,7 @@
 #include <memory>
 #include <cmath>
 #include <mutex>
+#include <atomic>
 #include <concepts>
 
 namespace GreekCore {
@@ -45,6 +46,75 @@ namespace GreekCore {
         
         void dumpOneResult(double result);
         std::vector<std::vector<double>> getResultsSoFar() const;
+    };
+
+
+    /**
+     * @brief Lock-Free Mean Gatherer (C++20)
+     * 
+     * Leverages std::atomic<double> to allow concurrent updates without mutex overhead.
+     * This is significantly faster for high-frequency updates but provides "eventual consistency"
+     * when reading results while updates are happening.
+     * 
+     * Note: std::atomic<double> requires C++20.
+     */
+    class StatisticsMeanLockFree {
+    private:
+        std::atomic<double> m_runningSum{0.0};
+        std::atomic<double> m_runningSumSq{0.0};
+        std::atomic<unsigned long> m_pathsDone{0};
+
+    public:
+        StatisticsMeanLockFree() = default;
+
+        // Atomics are not copyable, so we delete copy operations.
+        // The gathering instance should be passed by reference or wrapped in a shared_ptr if needed.
+        StatisticsMeanLockFree(const StatisticsMeanLockFree&) = delete;
+        StatisticsMeanLockFree& operator=(const StatisticsMeanLockFree&) = delete;
+
+        void dumpOneResult(double result) {
+            // Relaxed ordering is sufficient for simple accumulation.
+            // We don't need to synchronize with other memory operations here.
+            m_pathsDone.fetch_add(1, std::memory_order_relaxed);
+            
+            // C++20 atomic floating point addition
+            m_runningSum.fetch_add(result, std::memory_order_relaxed);
+            m_runningSumSq.fetch_add(result * result, std::memory_order_relaxed);
+        }
+
+        std::vector<std::vector<double>> getResultsSoFar() const {
+            std::vector<std::vector<double>> results(1);
+            results[0].resize(2); // [Mean, StdErr]
+
+            // Load atomically. We might see a torn state (e.g. paths updated but sums not yet),
+            // but for progress monitoring this is acceptable.
+            unsigned long paths = m_pathsDone.load(std::memory_order_relaxed);
+            double sum = m_runningSum.load(std::memory_order_relaxed);
+            double sumSq = m_runningSumSq.load(std::memory_order_relaxed);
+
+            if (paths == 0) return results;
+
+            // Recalculate variance carefully (handling potential negatives due to torn reads)
+            double mean = sum / paths;
+            results[0][0] = mean;
+
+            // Naive variance formula: sumSq - mean * sum
+            // This can be numerically unstable if sumSq and mean*sum are very close, 
+            // but for monitoring it's okay.
+            double variance_numerator = (sumSq - mean * sum);
+            
+            double variance = 0.0;
+            if (paths > 1) {
+                 variance = variance_numerator / (paths - 1);
+            } 
+
+            if (variance < 0.0) variance = 0.0;
+            
+            double stdErr = std::sqrt(variance / paths); // Standard Error of Mean
+            results[0][1] = stdErr;
+
+            return results;
+        }
     };
 
 
@@ -133,14 +203,25 @@ namespace GreekCore {
         explicit StatisticsThreadSafe(InnerGatherer&& inner)
             : m_inner(std::move(inner)) {}
 
-        // Move constructor (mutex cannot be moved, start fresh)
-        StatisticsThreadSafe(StatisticsThreadSafe&& other) noexcept
+        StatisticsThreadSafe(StatisticsThreadSafe&& other) noexcept 
             : m_inner(std::move(other.m_inner)) {
         }
         
-        // Deleted Copy Constructor (std::mutex is not copyable)
-        StatisticsThreadSafe(const StatisticsThreadSafe&) = delete;
-        StatisticsThreadSafe& operator=(const StatisticsThreadSafe&) = delete;
+        // Custom Copy Constructor (Value Semantics)
+        StatisticsThreadSafe(const StatisticsThreadSafe& other) {
+            std::lock_guard<std::mutex> lock(other.m_mutex);
+            m_inner = other.m_inner; // Assumes InnerGatherer is copyable
+        }
+
+        StatisticsThreadSafe& operator=(const StatisticsThreadSafe& other) {
+            if (this != &other) {
+                // Use std::scoped_lock (C++17) to lock both mutexes safely without deadlock.
+                // This allows direct assignment without an intermediate copy.
+                std::scoped_lock lock(m_mutex, other.m_mutex);
+                m_inner = other.m_inner;
+            }
+            return *this;
+        }
 
         void dumpOneResult(double result) {
             std::lock_guard<std::mutex> lock(m_mutex);
