@@ -68,8 +68,6 @@ if(BUILD_BENCHMARKS)
 
     add_subdirectory(benchmarks)
 
-# Applications
-add_subdirectory(apps/MarketMaker)
 endif()
 # Example showing the Bridge logic from screenshots
 add_executable(BridgeUsage examples/BridgeUsage.cpp)
