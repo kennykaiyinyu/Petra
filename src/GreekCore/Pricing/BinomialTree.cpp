@@ -14,22 +14,18 @@ namespace GreekCore {
         double dt = T / steps;
         double df = std::exp(-r * dt);
         
-        // CRR Parameters
         double u = std::exp(sigma * std::sqrt(dt));
         double d = 1.0 / u;
         double p = (std::exp(r * dt) - d) / (u - d);
         double q = 1.0 - p;
 
-        // Initialize leaves at maturity (Step N)
         std::vector<double> values(steps + 1);
         
-        // j counts number of 'up' moves
         for (int j = 0; j <= steps; ++j) {
             double spot = S0 * std::pow(u, j) * std::pow(d, steps - j);
             values[j] = payoff(spot);
         }
 
-        // Variables to store Greek Calculation Data
         double val_u = 0.0, val_d = 0.0;     // Values at Step 1
         double val_uu = 0.0, val_ud = 0.0, val_dd = 0.0; // Values at Step 2
         
@@ -65,14 +61,12 @@ namespace GreekCore {
         double price = values[0];
 
         // Calculate Greeks
-        // Delta = (V_u - V_d) / (S_u - S_d)
+        // Delta
         double S_u = S0 * u;
         double S_d = S0 * d;
         double delta = (val_u - val_d) / (S_u - S_d);
 
         // Gamma
-        // Gamma approx = [ (V_uu - V_ud)/(S_uu - S_ud) - (V_ud - V_dd)/(S_ud - S_dd) ] / (0.5 * (S_uu - S_dd))
-        // S_ud = S0 (since u = 1/d)
         double S_uu = S0 * u * u;
         double S_dd = S0 * d * d;
         double S_ud = S0; // == S_uu * d approx
@@ -80,7 +74,6 @@ namespace GreekCore {
         double delta_upper = (val_uu - val_ud) / (S_uu - S_ud);
         double delta_lower = (val_ud - val_dd) / (S_ud - S_dd);
         
-        // Denominator is the change in spot between the midpoints of the upper/lower intervals
         double h = 0.5 * (S_uu - S_dd); 
         double gamma = (delta_upper - delta_lower) / h;
 

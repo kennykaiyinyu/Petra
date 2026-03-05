@@ -1,4 +1,4 @@
-add_executable(GreekCoreUnitTests InterpolatorTest.cpp BrentSolverTest.cpp YieldCurveTest.cpp MonteCarloTest.cpp TimeTest.cpp TenorTest.cpp BinomialTreeTest.cpp)
+add_executable(GreekCoreUnitTests InterpolatorStrategyTest.cpp BrentSolverTest.cpp YieldCurveTest.cpp MonteCarloTest.cpp TimeTest.cpp TenorTest.cpp BinomialTreeTest.cpp)
 
 target_link_libraries(GreekCoreUnitTests PRIVATE 
     GreekCore 

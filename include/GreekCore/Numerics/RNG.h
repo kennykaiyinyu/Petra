@@ -13,6 +13,12 @@ namespace GreekCore {
      * State size: 32 bytes (Fits in AVX registers).
      * Period: 2^256 - 1.
      * Speed: ~2-4x faster than std::mt19937.
+     * 
+     * @cite Implementation based on:
+     *       David Blackman and Sebastiano Vigna. 2021.
+     *       "Scrambled Linear Pseudorandom Number Generators".
+     *       ACM Trans. Math. Softw. 47, 4, Article 32 (December 2021).
+     *       https://prng.di.unimi.it/
      */
     struct Xoshiro256 {
         using result_type = uint64_t;

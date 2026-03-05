@@ -1,73 +1,94 @@
 #include "GreekCore/Rates/YieldCurve.h"
 #include "GreekCore/Numerics/BrentSolver.h"
-#include "GreekCore/Rates/Interpolator.h"
-#include "GreekCore/Time/DayCounter.h"
-#include <cmath>
 #include <stdexcept>
 
 namespace GreekCore {
 
-    // Default implementations used if none provided
-    static double defaultDayCounter(Date d1, Date d2) {
-        return Time::Actual365Fixed::year_fraction(d1, d2);
-    }
-
-    static double defaultInterpolator(double x, std::span<const double> x_vals, std::span<const double> y_vals) {
-        return LinearInterpolator::interpolate(x, x_vals, y_vals);
-    }
-
-    YieldCurve::YieldCurve(Date reference_date,
-                           DayCounterFn dc,
-                           InterpolatorFn interp)
-        : ref_date_(reference_date), 
-          dc_(dc ? std::move(dc) : defaultDayCounter),
-          interp_(interp ? std::move(interp) : defaultInterpolator)
-    {
+    /// @brief Construct a new Yield Curve object and bootstrap it immediately.
+    /// @tparam DC The Day Count Strategy type (e.g., Actual365Fixed).
+    /// @tparam Interp The Interpolation Strategy type (e.g., LinearInterpolator).
+    /// @param reference_date The anchor date (t=0) for the curve.
+    /// @param instruments A sorted span of market instruments (Deposits, FRAs, Swaps) used for bootstrapping.
+    /// @param dc Instance of the day count strategy.
+    /// @param interp Instance of the interpolation strategy.
+    template<DayCountStrategy DC, InterpolatorStrategy Interp>
+    YieldCurve<DC, Interp>::YieldCurve(Date reference_date, std::span<const CurveInput> instruments, DC dc, Interp interp)
+        : ref_date_(reference_date), day_count_convention_(std::move(dc)), interpolator_(std::move(interp)) {
+        
         // Initialize with today: t=0, DF=1.0 => log_df=0.0
-        times_.reserve(20);
-        log_dfs_.reserve(20);
+        times_.reserve(instruments.size() + 1);
+        log_dfs_.reserve(instruments.size() + 1);
         times_.push_back(0.0);
         log_dfs_.push_back(0.0);
-    }
 
-    double YieldCurve::getDiscountFactor(Date d) const {
-        if (d < ref_date_) throw std::invalid_argument("Date cannot be before reference date");
-        double t = dc_(ref_date_, d);
-        return getDiscountFactor(t);
-    }
-
-    double YieldCurve::getDiscountFactor(double t) const {
-        // Log-Linear Interpolation: Interpolate on Log DFs, then Exp
-        double log_df = interp_(t, times_, log_dfs_);
-        return std::exp(log_df);
-    }
-
-    double YieldCurve::getZeroRate(Date d) const {
-        double t = dc_(ref_date_, d);
-        return getZeroRate(t);
-    }
-
-    double YieldCurve::getZeroRate(double t) const {
-        if (t < 1e-8) return -log_dfs_[0];
-        double df = getDiscountFactor(t);
-        return -std::log(df) / t;
-    }
-
-    void YieldCurve::build(std::span<const CurveInput> instruments) {
+        // To follow RAII pattern: Run Bootstrap immediately
         for (const auto& instr : instruments) {
-            double T = dc_(ref_date_, instr.maturity_date);
+            double t_i = day_count_convention_(ref_date_, instr.maturity_date);
 
-            if (T <= times_.back()) {
+            if (t_i <= times_.back()) { [[unlikely]]
                 throw std::invalid_argument("Instruments must be sorted by maturity");
             }
 
-            bootstrapPoint(instr, T);
+            bootstrapPoint(instr, t_i);
         }
     }
 
-    void YieldCurve::bootstrapPoint(const CurveInput& instr, double T) {
+    /// @brief Calculates the discount factor for a specific date.
+    /// @param d The target date.
+    /// @return The discount factor P(0, d).
+    /// @throws std::invalid_argument if d < reference_date.
+    template<DayCountStrategy DC, InterpolatorStrategy Interp>
+    double YieldCurve<DC, Interp>::getDiscountFactor(Date d) const {
+        if (d < ref_date_) throw std::invalid_argument("Date cannot be before reference date");
+        return getDiscountFactor(day_count_convention_(ref_date_, d));
+    }
+
+    /// @brief Calculates the discount factor for a specific time fraction.
+    /// @param t Time in years from reference date.
+    /// @return The discount factor e^(-r*t).
+    template<DayCountStrategy DC, InterpolatorStrategy Interp>
+    double YieldCurve<DC, Interp>::getDiscountFactor(double t) const {
+        // Log-Linear Interpolation: Interpolate on Log DFs, then Exp
+        // Direct call to strategy (inlined)
+        double log_df = interpolator_.interpolate(t, times_, log_dfs_);
+        return std::exp(log_df);
+    }
+
+    /// @brief Calculates the continuously compounded zero rate for a specific date.
+    /// @param d The target date.
+    /// @return The annualized zero rate.
+    template<DayCountStrategy DC, InterpolatorStrategy Interp>
+    double YieldCurve<DC, Interp>::getZeroRate(Date d) const {
+        return getZeroRate(day_count_convention_(ref_date_, d));
+    }
+
+    /// @brief Calculates the continuously compounded zero rate for a specific time fraction.
+    /// @param t Time in years from reference date.
+    /// @return The annualized zero rate.
+    template<DayCountStrategy DC, InterpolatorStrategy Interp>
+    double YieldCurve<DC, Interp>::getZeroRate(double t) const {
+        if (t < 1e-8) {  [[unlikely]]
+            return -log_dfs_[0]; 
+        }
+        return -std::log(getDiscountFactor(t)) / t;
+    }
+
+    /// @brief Internal helper to bootstrap a single instrument onto the curve.
+    /// Solves for the zero rate/discount factor that prices the instrument at par.
+    /// @param instr The market instrument (Deposit, FRA, Swap).
+    /// @param T The maturity time of the instrument in years.
+    template<DayCountStrategy DC, InterpolatorStrategy Interp>
+    void YieldCurve<DC, Interp>::bootstrapPoint(const CurveInput& instr, double T) {
         double R = instr.rate;
-        int freq = instr.frequency;
+        
+        // Calculate time to start (relative to ref_date)
+        double T_start = day_count_convention_(ref_date_, instr.start_date);
+        
+        // Pre-calculate accrual for simple instruments
+        double accrual = 0.0;
+        if (instr.type != InstrumentType::Swap) {
+            accrual = day_count_convention_(instr.start_date, instr.maturity_date);
+        }
 
         auto pricer = [&](double trial_log_df) -> double {
             double prev_time = times_.back();
@@ -76,34 +97,30 @@ namespace GreekCore {
             // Helper to interpolate during solver trial
             auto calc_df = [&](double t) {
                 if (t <= prev_time) {
-                    return std::exp(interp_(t, times_, log_dfs_));
+                    return std::exp(interpolator_.interpolate(t, times_, log_dfs_));
                 }
-                // Linear interpolation on log_df for the current segment (prev -> current trial)
+                // Linear interpolation on log_df for the current segment
                 double slope = (trial_log_df - prev_log_df) / (T - prev_time);
                 double val = prev_log_df + slope * (t - prev_time);
                 return std::exp(val);
             };
 
-            if (freq == 0) { 
-                // Zero-Coupon / Deposit: (1 + R*T)*DF = 1
-                return calc_df(T) * (1.0 + R * T) - 1.0;
-            } else {
-                // Swap
-                double pv = 0.0;
+            double df_start = calc_df(T_start);
+            double df_end = std::exp(trial_log_df); 
+
+            if (instr.type == InstrumentType::Swap) {
+                int freq = instr.frequency;
                 double dt = 1.0 / freq;
-                // Sum cashflows
-                for (double t = dt; t <= T + 1e-4; t += dt) {
-                    // Check if we are at maturity (within tolerance) for principal repayment
-                    // Actually usually standard swaps don't exchange principal, but par swap rate implies PV(Legs) = Par
-                    // Here we assume PV(Coupons + Principal) = 1.0 logic often simplified for bootstrapping
-                    // Standard Par Swap: 1 = R * sum(DF_i * dt) + DF_T
-                    // R is the par swap rate.
-                    
-                    bool at_maturity = (std::abs(t - T) < 1e-4);
-                    double cashflow = (R / freq) + (at_maturity ? 1.0 : 0.0);
-                    pv += cashflow * calc_df(t);
+                double pv_legs = 0.0;
+                
+                for (double t = T_start + dt; t <= T + 1e-4; t += dt) {
+                    pv_legs += calc_df(t);
                 }
-                return pv - 1.0;
+                // Par Swap Equation: R * Sum(DF * dt) = DF_start - DF_end
+                return R * dt * pv_legs - (df_start - df_end);
+            } else {
+                // Deposit / FRA
+                return df_end * (1.0 + R * accrual) - df_start;
             }
         };
         
@@ -120,4 +137,9 @@ namespace GreekCore {
         log_dfs_.push_back(result.root);
     }
 
+    // Explicit Instantiation for the default types used in tests/applications
+    template class YieldCurve<Act365DayCounter, LinearInterpolator>;
+    template class YieldCurve<Act360DayCounter, LinearInterpolator>;
+    template class YieldCurve<ActActDayCounter, LinearInterpolator>;
+    template class YieldCurve<Thirty360DayCounter, LinearInterpolator>;
 }

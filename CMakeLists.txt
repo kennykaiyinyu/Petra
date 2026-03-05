@@ -12,14 +12,16 @@ set(SOURCES
     src/GreekCore/Pricing/BinomialTree.cpp
     src/GreekCore/Rates/Tenor.cpp
     src/GreekCore/Numerics/BrentSolver.cpp
-    src/GreekCore/Rates/Interpolator.cpp
     src/GreekCore/Numerics/RNG.cpp
     src/GreekCore/Pricing/PayOff.cpp
     src/GreekCore/Pricing/MonteCarlo.cpp
+    src/GreekCore/Pricing/Parameters.cpp
+    src/GreekCore/Numerics/Statistics.cpp
     src/GreekCore/Rates/YieldCurve.cpp
     src/GreekCore/Time/Date.cpp
     src/GreekCore/Time/Calendar.cpp
     src/GreekCore/Time/DayCounter.cpp
+    src/GreekCore/Time/NYSECalendar.cpp
 )
 
 # --- Component Library ---
@@ -66,6 +68,13 @@ if(BUILD_BENCHMARKS)
 
     add_subdirectory(benchmarks)
 
-# Applications
-add_subdirectory(apps/MarketMaker)
 endif()
+# Example showing the Bridge logic from screenshots
+add_executable(BridgeUsage examples/BridgeUsage.cpp)
+target_link_libraries(BridgeUsage PRIVATE GreekCore)
+
+add_executable(YieldCurveDemo examples/YieldCurveDemo.cpp)
+
+target_link_libraries(YieldCurveDemo PRIVATE GreekCore)
+
+

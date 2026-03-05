@@ -57,7 +57,6 @@ TEST(BinomialTreeTest, CalculatesGreeksSensibly) {
     double T = 1.0;
     int steps = 50; 
 
-    // Use European to compare against standard intuition easily
     PayOffVanilla payoff(OptionType::Call, K);
     auto res = BinomialTreePricer::price(S, r, sigma, T, steps, payoff, ExerciseType::European);
 

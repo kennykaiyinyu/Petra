@@ -47,7 +47,7 @@ TEST(TimeTest, CalendarLogic) {
     auto jan1 = make_date(2023, 1, 1);
     EXPECT_FALSE(cal.is_business_day(jan1));
 
-    // Jan 2 2023 was a Monday (Observed holiday in some places, but let's test basic logic)
+    // Jan 2 2023 was a Monday
     auto jan2 = make_date(2023, 1, 2);
     EXPECT_TRUE(cal.is_business_day(jan2));
 

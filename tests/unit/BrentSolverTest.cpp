@@ -29,9 +29,7 @@ TEST(BrentSolverTest, FindsRootOfTrigFunction) {
     EXPECT_NEAR(result.root, M_PI, 1e-8);
 }
 
-// Test difficult case: x * exp(-x) = 0.2
-// Use x - 0.2*exp(x) = 0 or similar for testing
-// Let's use f(x) = x^3 - 2x - 5 which has a root around 2.09455
+// Test difficult case: x^3 - 2x - 5 = 0
 TEST(BrentSolverTest, FindsRootOfCubic) {
     auto func = [](double x) { return x*x*x - 2*x - 5; };
     
