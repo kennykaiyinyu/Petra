@@ -124,11 +124,17 @@ TEST_F(YieldCurveTest, BootstrapsRealWorldData) {
     YieldCurve curve(refDate, market_instruments);
 
     // Verify 2Y Swap Repricing
-    // Par Swap Equation: Coupon * Sum(DF_i) + DF_n = 1.0
+    // Par Swap Equation: Coupon * Sum(DF_i * delta_i) + DF_n = 1.0
+    // Real-world: Must account for actual day counts (e.g. leap years)
     double C = 0.0480;
     double df_1y = curve.getDiscountFactor(market_instruments[3].maturity_date);
     double df_2y = curve.getDiscountFactor(market_instruments[4].maturity_date);
     
-    double pv = C * df_1y + (1.0 + C) * df_2y;
+    Act365DayCounter dc;
+    // Calculate year fractions for each period
+    double delta1 = dc(refDate, market_instruments[3].maturity_date);
+    double delta2 = dc(market_instruments[3].maturity_date, market_instruments[4].maturity_date);
+    
+    double pv = C * delta1 * df_1y + (1.0 + C * delta2) * df_2y;
     EXPECT_NEAR(pv, 1.0, 1e-6);
 }

@@ -109,19 +109,33 @@ namespace GreekCore {
             double df_end = std::exp(trial_log_df); 
 
             if (instr.type == InstrumentType::Swap) {
+                using namespace std::chrono;
+
                 int freq = instr.frequency;
-                double dt = 1.0 / freq;
-                double pv_legs = 0.0;
+                months period_duration{12 / freq};
                 
-                // the rounding allows ignoring of leap-years for simplicity
+                double pv_legs = 0.0;
+                Date payment_date = instr.maturity_date;
+                Date start_of_period;
+
+                // Align payments to Maturity (T) to handle dates properly (e.g. Leap Years)
+                // We iterate backwards from Maturity to ensure precise match at the end.
                 int num_periods = static_cast<int>(std::round((T - T_start) * freq));
                 
                 for (int i = 0; i < num_periods; ++i) {
-                    double t = T - i * dt;
-                    pv_legs += calc_df(t);
+                    // Backwards date generation
+                    year_month_day ymd{payment_date};
+                    start_of_period = Date{ymd - period_duration};
+
+                    double t_payment = day_count_convention_(ref_date_, payment_date);
+                    double accrual = day_count_convention_(start_of_period, payment_date);
+
+                    pv_legs += calc_df(t_payment) * accrual;
+                    
+                    payment_date = start_of_period;
                 }
-                // Par Swap Equation: R * Sum(DF * dt) = DF_start - DF_end
-                return R * dt * pv_legs - (df_start - df_end);
+
+                return R * pv_legs - (df_start - df_end);
             } else {
                 // Deposit / FRA
                 return df_end * (1.0 + R * accrual) - df_start;
