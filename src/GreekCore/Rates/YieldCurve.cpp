@@ -113,7 +113,11 @@ namespace GreekCore {
                 double dt = 1.0 / freq;
                 double pv_legs = 0.0;
                 
-                for (double t = T_start + dt; t <= T + 1e-4; t += dt) {
+                // the rounding allows ignoring of leap-years for simplicity
+                int num_periods = static_cast<int>(std::round((T - T_start) * freq));
+                
+                for (int i = 0; i < num_periods; ++i) {
+                    double t = T - i * dt;
                     pv_legs += calc_df(t);
                 }
                 // Par Swap Equation: R * Sum(DF * dt) = DF_start - DF_end
