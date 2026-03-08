@@ -4,7 +4,7 @@
 #include <string>
 #include <stdexcept>
 #include <cctype>
-#include <functional>
+#include <optional>
 #include "../Time/Date.h"
 #include "GreekCore/Time/Calendar.h"
 
@@ -31,7 +31,13 @@ namespace GreekCore::Rates {
         static Tenor parse(std::string_view s);
 
         /**
+         * @brief Non-throwing fast-path parser for C++ HFT environments.
+         */
+        static std::optional<Tenor> parse_noexcept(std::string_view s) noexcept;
+
+        /**
          * @brief Adds the tenor to a Date.
+
          * 
          * Simple implementation: Does NOT handle business day rolling.
          * Result may fall on a holiday or weekend.
@@ -44,14 +50,19 @@ namespace GreekCore::Rates {
         /**
          * @brief Adds the tenor to a Date and adjusts using a business day convention.
          * 
+         * @tparam Calendar Callable or object returning true if a date is a business day.
          * @param start The start date.
-         * @param convention Convention to handle holidays (e.g., Following, ModifiedFollowing).
-         * @param calendar Function or object returning true if a date is a business day (false if holiday).
+         * @param convention Convention to handle holidays.
+         * @param calendar Function or object for holiday checking.
          * @return The adjusted business date.
          */
+        template <typename Calendar>
         GreekCore::Time::Date add_to(const GreekCore::Time::Date& start, 
                                      GreekCore::Time::BusinessDayConvention convention,
-                                     std::function<bool(GreekCore::Time::Date)> calendar) const;
+                                     const Calendar& calendar) const {
+            GreekCore::Time::Date unadjusted = add_to(start);
+            return GreekCore::Time::adjust(unadjusted, convention, calendar);
+        }
     };
 }
 #endif

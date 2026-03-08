@@ -4,15 +4,23 @@
 #include <stdexcept>
 #include <string>
 #include <cctype>
+#include <charconv>
 
 namespace GreekCore::Rates {
 
     Tenor Tenor::parse(std::string_view s) {
-        if (s.empty()) throw std::invalid_argument("Empty tenor string");
+        auto t = parse_noexcept(s);
+        if (!t) [[unlikely]] {
+            throw std::invalid_argument("Invalid/Empty tenor string");
+        }
+        return *t;
+    }
+
+    std::optional<Tenor> Tenor::parse_noexcept(std::string_view s) noexcept {
+        if (s.empty()) return std::nullopt;
         
-        // Handle special conventions: O/N (Overnight), T/N (Tom-Next), S/N (Spot-Next)
         if (s == "ON" || s == "O/N" || s == "TN" || s == "T/N" || s == "SN" || s == "S/N") {
-            return {1, TimeUnit::Days};
+            return Tenor{1, TimeUnit::Days};
         }
 
         size_t unit_pos = 0;
@@ -20,11 +28,16 @@ namespace GreekCore::Rates {
             unit_pos++;
         }
 
-        if (unit_pos == 0 || unit_pos >= s.size()) {
-            throw std::invalid_argument("Invalid tenor format");
+        if (unit_pos == 0 || unit_pos >= s.size()) [[unlikely]] {
+            return std::nullopt;
         }
 
-        int amt = std::stoi(std::string(s.substr(0, unit_pos)));
+        int amt = 0;
+        auto [ptr, ec] = std::from_chars(s.data(), s.data() + unit_pos, amt);
+        if (ec != std::errc()) [[unlikely]] {
+            return std::nullopt;
+        }
+
         char u = std::toupper(s[unit_pos]);
 
         TimeUnit tu;
@@ -33,10 +46,10 @@ namespace GreekCore::Rates {
             case 'W': tu = TimeUnit::Weeks; break;
             case 'M': tu = TimeUnit::Months; break;
             case 'Y': tu = TimeUnit::Years; break;
-            default: throw std::invalid_argument("Unknown tenor unit");
+            default: return std::nullopt;
         }
 
-        return {amt, tu};
+        return Tenor{amt, tu};
     }
 
     GreekCore::Time::Date Tenor::add_to(const GreekCore::Time::Date& start) const {
@@ -56,12 +69,5 @@ namespace GreekCore::Rates {
             return Date{ymd + months(amount)};
         }
         return start;
-    }
-
-    GreekCore::Time::Date Tenor::add_to(const GreekCore::Time::Date& start, 
-                                        GreekCore::Time::BusinessDayConvention convention,
-                                        std::function<bool(GreekCore::Time::Date)> calendar) const {
-        GreekCore::Time::Date unadjusted = add_to(start);
-        return GreekCore::Time::adjust(unadjusted, convention, calendar);
     }
 }

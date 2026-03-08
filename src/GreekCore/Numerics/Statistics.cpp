@@ -2,15 +2,6 @@
 
 namespace GreekCore {
 
-    StatisticsMean::StatisticsMean() 
-        : m_runningSum(0.0), m_runningSumSq(0.0), m_pathsDone(0) {}
-
-    void StatisticsMean::dumpOneResult(double result) {
-        m_pathsDone++;
-        m_runningSum += result;
-        m_runningSumSq += result * result;
-    }
-
     std::vector<std::vector<double>> StatisticsMean::getResultsSoFar() const {
         std::vector<std::vector<double>> results(1);
         results[0].resize(2); // [Mean, StdErr]
