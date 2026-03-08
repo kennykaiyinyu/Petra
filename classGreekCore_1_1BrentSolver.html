@@ -87,99 +87,25 @@ $(function() {
   <div class="headertitle"><div class="title">GreekCore::BrentSolver Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
-
-<p>Brent's Method Implementation. Guaranteed convergence if the root is bracketed. Combines Bisection, Secant, and Inverse Quadratic Interpolation.  
- <a href="classGreekCore_1_1BrentSolver.html#details">More...</a></p>
-
-<p><code>#include &lt;<a class="el" href="BrentSolver_8h_source.html">BrentSolver.h</a>&gt;</code></p>
 <div class="dynheader">
 Collaboration diagram for GreekCore::BrentSolver:</div>
 <div class="dyncontent">
 <div class="center"><img src="classGreekCore_1_1BrentSolver__coll__graph.png" border="0" usemap="#aGreekCore_1_1BrentSolver_coll__map" alt="Collaboration graph"/></div>
 <map name="aGreekCore_1_1BrentSolver_coll__map" id="aGreekCore_1_1BrentSolver_coll__map">
-<area shape="rect" title="Brent&#39;s Method Implementation. Guaranteed convergence if the root is bracketed. Combines Bisection,..." alt="" coords="5,5,172,71"/>
+<area shape="rect" title=" " alt="" coords="5,5,172,71"/>
 </map>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:af863e983b6b2cdc486df3c2446689389" id="r_af863e983b6b2cdc486df3c2446689389"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classGreekCore_1_1YieldCurve.html">static</a> <a class="el" href="structGreekCore_1_1SolverResult.html">SolverResult</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classGreekCore_1_1BrentSolver.html#af863e983b6b2cdc486df3c2446689389">solve</a> (std::function&lt; <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a>(<a class="el" href="classGreekCore_1_1YieldCurve.html">double</a>)&gt; <a class="el" href="classGreekCore_1_1YieldCurve.html">f</a>, <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a> min, <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a> max, <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a> <a class="el" href="classGreekCore_1_1YieldCurve.html">tolerance</a>=1<a class="el" href="classGreekCore_1_1YieldCurve.html">e</a>-8, <a class="el" href="classGreekCore_1_1YieldCurve.html">int</a> <a class="el" href="classGreekCore_1_1YieldCurve.html">max_iter</a>=100)</td></tr>
-<tr class="memdesc:af863e983b6b2cdc486df3c2446689389"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solves f(x) = 0 for x in [min, max].  <br /></td></tr>
-<tr class="separator:af863e983b6b2cdc486df3c2446689389"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac59391741ed1619659e03f2a1676a664" id="r_ac59391741ed1619659e03f2a1676a664"><td class="memTemplParams" colspan="2"><a id="ac59391741ed1619659e03f2a1676a664" name="ac59391741ed1619659e03f2a1676a664"></a>
+template&lt;<a class="el" href="classGreekCore_1_1YieldCurve.html">typename</a> <a class="el" href="classGreekCore_1_1YieldCurve.html">F</a> &gt; </td></tr>
+<tr class="memitem:ac59391741ed1619659e03f2a1676a664"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="classGreekCore_1_1YieldCurve.html">static</a> FORCE_INLINE <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><b>solve</b> (<a class="el" href="classGreekCore_1_1YieldCurve.html">F</a> &amp;&amp;<a class="el" href="classGreekCore_1_1YieldCurve.html">f</a>, <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a> min, <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a> max, <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a> <a class="el" href="classGreekCore_1_1YieldCurve.html">tolerance</a>=1<a class="el" href="classGreekCore_1_1YieldCurve.html">e</a>-8, <a class="el" href="classGreekCore_1_1YieldCurve.html">int</a> <a class="el" href="classGreekCore_1_1YieldCurve.html">max_iter</a>=100)</td></tr>
+<tr class="memdesc:ac59391741ed1619659e03f2a1676a664"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solves f(x) = 0. Returns NaN if failed. Implementation is in header to allow aggressive inlining of the functor F. <br /></td></tr>
+<tr class="separator:ac59391741ed1619659e03f2a1676a664"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Brent's Method Implementation. Guaranteed convergence if the root is bracketed. Combines Bisection, Secant, and Inverse Quadratic Interpolation. </p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="af863e983b6b2cdc486df3c2446689389" name="af863e983b6b2cdc486df3c2446689389"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af863e983b6b2cdc486df3c2446689389">&#9670;&#160;</a></span>solve()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="structGreekCore_1_1SolverResult.html">SolverResult</a> GreekCore::BrentSolver::solve </td>
-          <td>(</td>
-          <td class="paramtype">std::function&lt; <a class="el" href="classGreekCore_1_1YieldCurve.html">double</a>(<a class="el" href="classGreekCore_1_1YieldCurve.html">double</a>)&gt;&#160;</td>
-          <td class="paramname"><em>f</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classGreekCore_1_1YieldCurve.html">double</a>&#160;</td>
-          <td class="paramname"><em>min</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classGreekCore_1_1YieldCurve.html">double</a>&#160;</td>
-          <td class="paramname"><em>max</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classGreekCore_1_1YieldCurve.html">double</a>&#160;</td>
-          <td class="paramname"><em>tolerance</em> = <code>1<a class="el" href="classGreekCore_1_1YieldCurve.html">e</a>-8</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="classGreekCore_1_1YieldCurve.html">int</a>&#160;</td>
-          <td class="paramname"><em>max_iter</em> = <code>100</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Solves f(x) = 0 for x in [min, max]. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">f</td><td>The function to solve. </td></tr>
-    <tr><td class="paramname">min</td><td>Lower bound of the bracket. </td></tr>
-    <tr><td class="paramname">max</td><td>Upper bound of the bracket. </td></tr>
-    <tr><td class="paramname">tolerance</td><td>Convergence tolerance (absolute). </td></tr>
-    <tr><td class="paramname">max_iter</td><td>Maximum number of iterations. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd><a class="el" href="structGreekCore_1_1SolverResult.html">SolverResult</a> containing the root and status. </dd></dl>
-
-</div>
-</div>
-<hr/>The documentation for this class was generated from the following files:<ul>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>include/GreekCore/Numerics/<a class="el" href="BrentSolver_8h_source.html">BrentSolver.h</a></li>
-<li>src/GreekCore/Numerics/<b>BrentSolver.cpp</b></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
