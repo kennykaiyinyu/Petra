@@ -10,13 +10,13 @@ TEST(BrentSolverTest, FindsRootsOfPolynomial) {
     
     // Test bracket [0, 5], expected root 2
     auto result = BrentSolver::solve(func, 0.0, 5.0);
-    EXPECT_TRUE(result.converged);
-    EXPECT_NEAR(result.root, 2.0, 1e-8);
+    EXPECT_FALSE(std::isnan(result));
+    EXPECT_NEAR(result, 2.0, 1e-8);
 
     // Test bracket [-5, 0], expected root -2
     auto result2 = BrentSolver::solve(func, -5.0, 0.0);
-    EXPECT_TRUE(result2.converged);
-    EXPECT_NEAR(result2.root, -2.0, 1e-8);
+    EXPECT_FALSE(std::isnan(result2));
+    EXPECT_NEAR(result2, -2.0, 1e-8);
 }
 
 // Test trigonometric function: sin(x) = 0 -> Root at PI
@@ -25,8 +25,8 @@ TEST(BrentSolverTest, FindsRootOfTrigFunction) {
     
     // Bracket [3, 4], expect PI ~ 3.14159...
     auto result = BrentSolver::solve(func, 3.0, 4.0);
-    EXPECT_TRUE(result.converged);
-    EXPECT_NEAR(result.root, M_PI, 1e-8);
+    EXPECT_FALSE(std::isnan(result));
+    EXPECT_NEAR(result, M_PI, 1e-8);
 }
 
 // Test difficult case: x^3 - 2x - 5 = 0
@@ -35,8 +35,8 @@ TEST(BrentSolverTest, FindsRootOfCubic) {
     
     // Bracket [1, 3]
     auto result = BrentSolver::solve(func, 1.0, 3.0);
-    EXPECT_TRUE(result.converged);
-    EXPECT_NEAR(result.root, 2.09455148, 1e-6);
+    EXPECT_FALSE(std::isnan(result));
+    EXPECT_NEAR(result, 2.09455148, 1e-6);
 }
 
 TEST(BrentSolverTest, FailsWithoutBracket) {
@@ -44,8 +44,7 @@ TEST(BrentSolverTest, FailsWithoutBracket) {
     
     // Bracket [-1, 1], both positive
     auto result = BrentSolver::solve(func, -1.0, 1.0);
-    EXPECT_FALSE(result.converged);
-    EXPECT_EQ(result.root, 0.0); // Fail sentinel
+    EXPECT_TRUE(std::isnan(result));
 }
 
 TEST(BrentSolverTest, FindsExactRootAtBound) {
@@ -53,6 +52,6 @@ TEST(BrentSolverTest, FindsExactRootAtBound) {
     
     // Bound is the root
     auto result = BrentSolver::solve(func, 5.0, 10.0);
-    EXPECT_TRUE(result.converged);
-    EXPECT_DOUBLE_EQ(result.root, 5.0);
+    EXPECT_FALSE(std::isnan(result));
+    EXPECT_DOUBLE_EQ(result, 5.0);
 }

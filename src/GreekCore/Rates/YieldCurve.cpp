@@ -1,6 +1,7 @@
 #include "GreekCore/Rates/YieldCurve.h"
 #include "GreekCore/Numerics/BrentSolver.h"
 #include <stdexcept>
+#include <cmath>
 
 namespace GreekCore {
 
@@ -15,13 +16,11 @@ namespace GreekCore {
     YieldCurve<DC, Interp>::YieldCurve(Date reference_date, std::span<const CurveInput> instruments, DC dc, Interp interp)
         : ref_date_(reference_date), day_count_convention_(std::move(dc)), interpolator_(std::move(interp)) {
         
-        // Initialize with today: t=0, DF=1.0 => log_df=0.0
         times_.reserve(instruments.size() + 1);
         log_dfs_.reserve(instruments.size() + 1);
         times_.push_back(0.0);
         log_dfs_.push_back(0.0);
 
-        // To follow RAII pattern: Run Bootstrap immediately
         for (const auto& instr : instruments) {
             double t_i = day_count_convention_(ref_date_, instr.maturity_date);
 
@@ -48,8 +47,6 @@ namespace GreekCore {
     /// @return The discount factor e^(-r*t).
     template<DayCountStrategy DC, InterpolatorStrategy Interp>
     double YieldCurve<DC, Interp>::getDiscountFactor(double t) const {
-        // Log-Linear Interpolation: Interpolate on Log DFs, then Exp
-        // Direct call to strategy (inlined)
         double log_df = interpolator_.interpolate(t, times_, log_dfs_);
         return std::exp(log_df);
     }
@@ -80,11 +77,8 @@ namespace GreekCore {
     template<DayCountStrategy DC, InterpolatorStrategy Interp>
     void YieldCurve<DC, Interp>::bootstrapPoint(const CurveInput& instr, double T) {
         double R = instr.rate;
-        
-        // Calculate time to start (relative to ref_date)
         double T_start = day_count_convention_(ref_date_, instr.start_date);
         
-        // Pre-calculate accrual for simple instruments
         double accrual = 0.0;
         if (instr.type != InstrumentType::Swap) {
             accrual = day_count_convention_(instr.start_date, instr.maturity_date);
@@ -94,12 +88,10 @@ namespace GreekCore {
             double prev_time = times_.back();
             double prev_log_df = log_dfs_.back();
 
-            // Helper to interpolate during solver trial
             auto calc_df = [&](double t) {
                 if (t <= prev_time) {
                     return std::exp(interpolator_.interpolate(t, times_, log_dfs_));
                 }
-                // Linear interpolation on log_df for the current segment
                 double slope = (trial_log_df - prev_log_df) / (T - prev_time);
                 double val = prev_log_df + slope * (t - prev_time);
                 return std::exp(val);
@@ -110,7 +102,6 @@ namespace GreekCore {
 
             if (instr.type == InstrumentType::Swap) {
                 using namespace std::chrono;
-
                 int freq = instr.frequency;
                 months period_duration{12 / freq};
                 
@@ -118,26 +109,19 @@ namespace GreekCore {
                 Date payment_date = instr.maturity_date;
                 Date start_of_period;
 
-                // Align payments to Maturity (T) to handle dates properly (e.g. Leap Years)
-                // We iterate backwards from Maturity to ensure precise match at the end.
                 int num_periods = static_cast<int>(std::round((T - T_start) * freq));
                 
                 for (int i = 0; i < num_periods; ++i) {
-                    // Backwards date generation
                     year_month_day ymd{payment_date};
                     start_of_period = Date{ymd - period_duration};
-
                     double t_payment = day_count_convention_(ref_date_, payment_date);
-                    double accrual = day_count_convention_(start_of_period, payment_date);
-
-                    pv_legs += calc_df(t_payment) * accrual;
-                    
+                    double leg_accrual = day_count_convention_(start_of_period, payment_date);
+                    pv_legs += calc_df(t_payment) * leg_accrual;
                     payment_date = start_of_period;
                 }
 
                 return R * pv_legs - (df_start - df_end);
             } else {
-                // Deposit / FRA
                 return df_end * (1.0 + R * accrual) - df_start;
             }
         };
@@ -145,17 +129,17 @@ namespace GreekCore {
         double min_log = -T * 2.0; 
         double max_log = T * 0.1;
 
-        auto result = BrentSolver::solve(pricer, min_log, max_log);
+        double root = BrentSolver::solve(pricer, min_log, max_log);
 
-        if (!result.converged) {
+        if (std::isnan(root)) {
             throw std::runtime_error("Bootstrap failed to converge");
         }
 
         times_.push_back(T);
-        log_dfs_.push_back(result.root);
+        log_dfs_.push_back(root);
     }
-
-    // Explicit Instantiation for the default types used in tests/applications
+    
+    // Explicit instantiations
     template class YieldCurve<Act365DayCounter, LinearInterpolator>;
     template class YieldCurve<Act360DayCounter, LinearInterpolator>;
     template class YieldCurve<ActActDayCounter, LinearInterpolator>;
