@@ -42,9 +42,16 @@ namespace GreekCore {
         unsigned long m_pathsDone;
 
     public:
-        StatisticsMean();
+        StatisticsMean() 
+            : m_runningSum(0.0), m_runningSumSq(0.0), m_pathsDone(0) 
+        {}
         
-        void dumpOneResult(double result);
+        void dumpOneResult(double result) {
+            m_pathsDone++;
+            m_runningSum += result;
+            m_runningSumSq += result * result;
+        }
+
         std::vector<std::vector<double>> getResultsSoFar() const;
     };
 
